@@ -4,23 +4,24 @@
 #include "global.h"
 #include "errors.h"
 
-
-void read_word();
-void read_number();
-void read_special();
-void read_separator();
-void read_comment();
-void read_error();
-
-
-int is_special();
-int is_char();
-int is_digit();
-int is_separator();
-int is_comment();
+static void read_word();
+static void read_number();
+static void read_special();
+static void read_separator();
+static void read_comment();
+static void read_error();
 
 
-void next_char();
+static boolean is_special();
+static boolean is_char();
+static boolean is_numeric();
+static boolean is_separator();
+static boolean is_comment();
+
+
+static void next_char();
+static void flush_word();
+
 void next_symbol();
 
 
