@@ -72,7 +72,7 @@ static boolean is_special() {
  */
 static boolean is_separator() {
 	switch (current_char) {
-		case ' ':
+		case ' ' :
 		case '\n':
 		case '\t':
 			return true; break;
@@ -87,4 +87,18 @@ static boolean is_separator() {
  */
 static boolean is_comment() {
 	
+}
+
+
+/*
+ * Retrieving the next word
+ */
+void next_symbol() {
+	// Read the first character of the file
+	next_char();
+	
+	// search for the grammar
+	do {
+
+	} while(current_char != EOF);
 }

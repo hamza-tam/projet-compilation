@@ -2,6 +2,9 @@
 #define GLOBAL_H
 
 #include <stdio.h>
+#include <stdlib.h>
+#include <unistd.h>
+#include <string.h>
 
 
 #define WORD_LENGTH 200+1
@@ -29,9 +32,9 @@ struct _symbol {
 
 
 // Variable declaration
-static FILE* file;
+FILE* file;
 
-static char current_char;
-static struct _symbol current_symbol;
+char current_char;
+struct _symbol current_symbol;
 
 #endif
