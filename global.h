@@ -37,4 +37,7 @@ FILE* file;
 char current_char;
 struct _symbol current_symbol;
 
+int current_line;
+
+
 #endif
