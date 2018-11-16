@@ -367,6 +367,7 @@ static void read_decimal_literal(){
 				next_char();
 			} 
 		//is a real number
+		printf("\n real number");
 		assign_token();
 		}
 		else{
@@ -378,6 +379,7 @@ static void read_decimal_literal(){
 	}
 	else{
 		// is an integer number
+		printf("\n integer number");
 		assign_token();
 	}
 	

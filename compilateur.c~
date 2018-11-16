@@ -1,12 +1,16 @@
+<<<<<<< HEAD
 #include <stdio.h>
 #include <stdlib.h>
-
+=======
+>>>>>>> 593759a313c6cdbfcfbaf1624790a7bb7f982beb
 #include "analyseur_lexical.h"
 #include "global.h"
 
 int main() {
 
-	file = fopen("test.ada", "r");
+	file = fopen("test2.ada", "r");
+	next_symbol();
+	fclose(file);
 
 	return 0;
 }

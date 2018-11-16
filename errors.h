@@ -1,18 +1,13 @@
-#ifndef ERRORS_H
-#define ERRORS_H
+#include "global.h"
+
+#define ERRORS_NUMBER	3
 
 
-
-enum error_codes {
-	FIRST_ERROR,
-};
-
-
-// Function declaration
-
-void raise_error(enum error_codes code);
-
-void show_error();
+typedef enum _error_codes {
+	UNRECOGNIZED_CHARACTER_ERROR,
+	SINGLE_QUOTE_EXPECTED_ERROR,
+	CHARACTER_EXPECTED_ERROR,
+} error_code;
 
 
-#endif
+void raise_error(error_code);

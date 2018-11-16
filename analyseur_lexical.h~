@@ -27,7 +27,7 @@ static boolean is_double_quote();
 static boolean is_single_quote();
 static boolean is_end_of_file();
 static boolean is_new_line();
-static boolean is_point_char();
+
 static void next_char();
 static void flush_word();
 

@@ -5,7 +5,9 @@
 
 int main() {
 
-	file = fopen("test.ada", "r");
+	file = fopen("test2.ada", "r");
+	next_symbol();
+	fclose(file);
 
 	return 0;
 }
