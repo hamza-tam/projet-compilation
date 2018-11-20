@@ -269,7 +269,7 @@ static void read_character() {
 	// moving to the next character
 	next_char();
 
-	if (is_char()) next_char();
+	if (is_char() || is_numeric()) next_char();
 	else {
 		raise_error(CHARACTER_EXPECTED_ERROR);
 		next_char();
