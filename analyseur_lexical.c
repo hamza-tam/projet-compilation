@@ -17,14 +17,14 @@ void next_symbol() {
 	// search for the grammar
 	do {
 
-		if (is_char()) read_word();
-		else if(is_numeric()) read_number();
+		if(is_numeric()) read_number();
 		else if (is_double_quote()) read_string();
 		else if (is_end_of_file()) read_end_of_file();
 		else if (is_new_line()) read_new_line();
 		else if (is_single_quote()) read_character();
 		else if (is_separator()) read_separator();
 		else if (is_special()) read_special();
+		else if (is_char()) read_word();
 		else read_error();
 
 		flush_word();
@@ -61,13 +61,34 @@ static void flush_word() {
 /*
  * Assigning the token to the current word
  */
-static void assign_token() {
+static void assign_token(token t) {
 	// Do not include the current character in the
 	// word used to generate the token
 	current_symbol.word[current_index-1] = '\0';
 
-	// TODO assign the token to this word
-	printf("%s \n", current_symbol.word);
+	// If we have a token at the argument of the
+	// function
+	if (t != NOTHING) {
+		current_symbol.code = t;
+		printf("AFF %i: %s \n", t, current_symbol.word);
+	} 
+	// If we need to find the token
+	else {
+		// Comparing the current word with each keyword
+		int i;
+		for (i = 0; i < TOKEN_LIST_SIZE; i++) {
+			if (strcmp(current_symbol.word, keywords[i]) == 0) {
+				current_symbol.code = (token) i;
+				printf("AFF %i : %s \n", i, current_symbol.word);
+				break;
+			}
+		}
+
+		if (i == TOKEN_LIST_SIZE) {
+			current_symbol.code = ID_TOKEN;		
+			printf("AFF %i : %s \n", i, current_symbol.word);
+		}
+	}
 }
 
 
@@ -238,7 +259,7 @@ static void read_word() {
 	}
 
 	// Assigning the token
-	assign_token();
+	assign_token(NOTHING);
 
 }
 
@@ -258,7 +279,7 @@ static void read_string() {
 
 	next_char();
 
-	assign_token();
+	assign_token(STRING_TOKEN);
 }
 
 
@@ -270,7 +291,7 @@ static void read_special() {
 	// Moving to the next character
 	next_char();
 
-	assign_token();
+	assign_token(NOTHING);
 }
 
 
@@ -291,7 +312,7 @@ static void read_character() {
 	// Reading the next single quote
 	if (is_single_quote()) {
 		next_char();
-		assign_token();
+		assign_token(CHAR_TOKEN);
 	} else {
 		raise_error(SINGLE_QUOTE_EXPECTED_ERROR);
 	}
@@ -303,7 +324,7 @@ static void read_character() {
  */
 static void read_end_of_file() {
 	strcpy(current_symbol.word, "END OF FILE");
-	assign_token();
+	assign_token(NOTHING);
 }
 
 
@@ -367,7 +388,7 @@ static void read_decimal_literal(){
 				next_char();
 			} 
 		//is a real number
-		assign_token();
+		assign_token(REAL_NUMBER_TOKEN);
 		}
 		else{
 			// we must have a digit after point character
@@ -378,7 +399,7 @@ static void read_decimal_literal(){
 	}
 	else{
 		// is an integer number
-		assign_token();
+		assign_token(INTEGER_TOKEN);
 	}
 	
 }
