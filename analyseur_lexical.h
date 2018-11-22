@@ -7,6 +7,8 @@
 
 
 static char keywords[TOKEN_LIST_SIZE][20] = {
+
+	// Real key words of the language
 	"abort",
 	"abs" , 
 	"abstract" , 
@@ -81,6 +83,21 @@ static char keywords[TOKEN_LIST_SIZE][20] = {
 	"with" , 
 	"xor",
 	"EOF" 
+
+	// Symbols used in the language
+
+	"=",
+	"+",
+	"-",
+	"*",
+	"/",
+	":=",
+	">",
+	">=",
+	"<",
+	"<=",
+	"(",
+	")",
 };
 
 
@@ -106,6 +123,9 @@ static boolean is_single_quote();
 static boolean is_end_of_file();
 static boolean is_new_line();
 static boolean is_point_char();
+static boolean is_second_special();
+
+
 static void next_char();
 static void flush_word();
 

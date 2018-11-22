@@ -18,12 +18,12 @@ void next_symbol() {
 	do {
 
 		if(is_numeric()) read_number();
+		else if (is_special()) read_special();
 		else if (is_double_quote()) read_string();
 		else if (is_end_of_file()) read_end_of_file();
 		else if (is_new_line()) read_new_line();
 		else if (is_single_quote()) read_character();
 		else if (is_separator()) read_separator();
-		else if (is_special()) read_special();
 		else if (is_char()) read_word();
 		else read_error();
 
@@ -70,7 +70,7 @@ static void assign_token(token t) {
 	// function
 	if (t != NOTHING) {
 		current_symbol.code = t;
-		printf("AFF %i: %s \n", t, current_symbol.word);
+		printf("AFF %i : %s \n", t, current_symbol.word);
 	} 
 	// If we need to find the token
 	else {
@@ -84,6 +84,7 @@ static void assign_token(token t) {
 			}
 		}
 
+		// If we couldn't find any token
 		if (i == TOKEN_LIST_SIZE) {
 			current_symbol.code = ID_TOKEN;		
 			printf("AFF %i : %s \n", i, current_symbol.word);
@@ -136,9 +137,26 @@ static boolean is_special() {
 		case ';':
 		case '(':
 		case ')':
+		case '>':
+		case '<':		
 			return true; break;
 
 		default: return false; break;
+	}
+}
+
+
+/*
+ * Reading the second special character that could be
+ * used as a second special character
+ */
+static boolean is_second_special() {
+	switch(current_char) {
+		case '=':
+			return true; break;
+
+		default:
+			return false; break;
 	}
 }
 
@@ -290,6 +308,7 @@ static void read_special() {
 
 	// Moving to the next character
 	next_char();
+	if (is_second_special()) next_char();
 
 	assign_token(NOTHING);
 }

@@ -8,7 +8,7 @@
 
 
 #define WORD_LENGTH 200+1
-#define TOKEN_LIST_SIZE 74
+#define TOKEN_LIST_SIZE 86
 
 // Declaring a boolean
 typedef enum _boolean {
@@ -97,6 +97,21 @@ typedef enum _token_list {
 	WITH_TOKEN , 
 	XOR_TOKEN,
 	EOF_TOKEN ,
+
+	// Token used for the symbols of the language
+	EQUAL_TOKEN, 
+	PLUS_TOKEN,
+	SUBSTRACT_TOKEN, 
+	MULTIPLY_TOKEN,
+	DIVIDE_TOKEN,
+	INITIALIZATION_TOKEN, 
+	GREATER_TOKEN,
+	GREATER_EQUAL_TOKEN,
+	LESS_TOKEN,
+	LESS_EQUAL_TOKEN,
+	OPEN_PARENTHESIS_TOKEN,
+	CLOSE_PARENTHESIS_TOKEN,
+
 
 	// Special tokens
 	ID_TOKEN,
