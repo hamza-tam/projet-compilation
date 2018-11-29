@@ -14,5 +14,8 @@ char* errors[ERRORS_NUMBER] = {
  * the compiler
  */
 void raise_error(error_code ec) {
-	printf("Error number %i: %s on line %i \n", ec, errors[ec], current_line);
+	if (ec >= ERRORS_NUMBER)
+		printf("Error number %i: error without a message yet on line %i \n", ec, current_line);
+	else 
+		printf("Error number %i: %s on line %i \n", ec, errors[ec], current_line);
 }

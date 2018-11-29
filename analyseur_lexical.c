@@ -4,32 +4,38 @@
 int current_index = 0;
 
 
-/*
- * Retrieving the next word
+/**
+ * Initialization of the lexical analyzer 
  */
-void next_symbol() {
+void init_symbol() {
 	// Initialiwing the line count
 	current_line = 1;
 
 	// Read the first character of the file
 	next_char();
-	
-	// search for the grammar
-	do {
+}
 
-		if(is_numeric()) read_number();
+
+/*
+ * Retrieving the next word
+ */
+void next_symbol() {	
+	do {
+		// Clear the buffer
+		flush_word();
+
+		// search for the grammar
+		if (is_end_of_file()) read_end_of_file();
+		else if(is_numeric()) read_number();
 		else if (is_special()) read_special();
 		else if (is_double_quote()) read_string();
-		else if (is_end_of_file()) read_end_of_file();
 		else if (is_new_line()) read_new_line();
 		else if (is_single_quote()) read_character();
 		else if (is_separator()) read_separator();
 		else if (is_char()) read_word();
 		else read_error();
 
-		flush_word();
-
-	} while(current_char != EOF);
+	} while(current_symbol.code == SEPARATOR_TOKEN);
 }
 
 
@@ -66,8 +72,7 @@ static void assign_token(token t) {
 	// word used to generate the token
 	current_symbol.word[current_index-1] = '\0';
 
-	// If we have a token at the argument of the
-	// function
+	// If we have a token at the argument of the function
 	if (t != NOTHING) {
 		current_symbol.code = t;
 		printf("AFF %i : %s \n", t, current_symbol.word);
@@ -78,7 +83,7 @@ static void assign_token(token t) {
 		int i;
 		for (i = 0; i < TOKEN_LIST_SIZE; i++) {
 			if (strcmp(current_symbol.word, keywords[i]) == 0) {
-				current_symbol.code = (token) i;
+				current_symbol.code = i;
 				printf("AFF %i : %s \n", i, current_symbol.word);
 				break;
 			}
@@ -352,6 +357,8 @@ static void read_end_of_file() {
  */
 static void read_separator() {
 	next_char();
+
+	assign_token(SEPARATOR_TOKEN);
 }
 
 
