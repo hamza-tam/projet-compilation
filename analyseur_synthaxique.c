@@ -1,12 +1,12 @@
 #include "analyseur_synthaxique.h"
 
-
 /**
  * The start of the syntactic analyzer
  */
 boolean PROGRAM() {
 	// Initialization
 	init_symbol();
+	init_symbol_table();
 
 	// Reading the first token
 	next_symbol();
@@ -29,7 +29,7 @@ boolean PROGRAM() {
 /**
  * DECLARATIVE_PART ::= {DECLARATIVE ITEM}
  */
-boolean DECLARATIVE_PART() {
+static boolean DECLARATIVE_PART() {
 	DECLARATIVE_ITEM();
 
 	return false;
@@ -39,7 +39,7 @@ boolean DECLARATIVE_PART() {
 /**
  * DECLARATIVE_ITEM ::= BASIC_DECLARATIVE_ITEM | BODY
  */
-boolean DECLARATIVE_ITEM() {
+static boolean DECLARATIVE_ITEM() {
 	BASIC_DECLARATIVE_ITEM();
 
 	return false;
@@ -49,7 +49,7 @@ boolean DECLARATIVE_ITEM() {
 /**
  * DECLARATIVE_ITEM ::= BASIC_DECLARATIVE_ITEM | BODY
  */
-boolean BASIC_DECLARATIVE_ITEM() {
+static boolean BASIC_DECLARATIVE_ITEM() {
 	BASIC_DECLARATIVE_ITEM();
 
 	return false;
@@ -57,7 +57,7 @@ boolean BASIC_DECLARATIVE_ITEM() {
 
 
 // TOFO Writing the grammar
-boolean BODY() {
+static boolean BODY() {
 	return false;
 }
 
@@ -65,7 +65,7 @@ boolean BODY() {
 /**
  * HANDLED_STATEMENT_OF_SEQUENCE ::= SEQUENCE_OF_STATEMENT
  */
-boolean HANDLED_STATEMENT_OF_SEQUENCE() {
+static boolean HANDLED_STATEMENT_OF_SEQUENCE() {
 	if (SEQUENCE_OF_STATEMENT()) return true;
 	return false;
 }
@@ -74,9 +74,11 @@ boolean HANDLED_STATEMENT_OF_SEQUENCE() {
 /**
  * SEQUENCE_OF_STATEMENT ::= STATEMENT {STATEMENT} {LABEL}
  */
-boolean SEQUENCE_OF_STATEMENT() {
+static boolean SEQUENCE_OF_STATEMENT() {
 	// Reading at least one statement grammar
 	if (!STATEMENT()) return false;
+
+	while(STATEMENT());
 
 	return true;
 }
@@ -84,7 +86,7 @@ boolean SEQUENCE_OF_STATEMENT() {
 /**
  * STATEMENT ::= {LABEL} SIMPLE_STATEMENT | {LABEL} COMPOUND_STATEMENT
  */
-boolean STATEMENT() {
+static boolean STATEMENT() {
 	// Reading a simple statement or a compound statement
 	if (SIMPLE_STATEMENT()) return true;
 	else if (COMPOUND_STATEMENT()) return true;
@@ -93,47 +95,84 @@ boolean STATEMENT() {
 
 
 /**
- * SIMPLE_STATEMENT ::= ASSIGNEMENT_STATEMENT | EXIT_STATEMENT | PRECEDURE_CALL_STATEMENT | SIMPLE_RETURN_STATEMENT | GOTO_STATEMENT | RAISE_STATEMENT
+ * SIMPLE_STATEMENT ::= ASSIGNEMENT_STATEMENT | PRECEDURE_CALL_STATEMENT | EXIT_STATEMENT | SIMPLE_RETURN_STATEMENT
  */
-boolean SIMPLE_STATEMENT() {
-	if (ASSIGNEMENT_STATEMENT()) return true;
+static boolean SIMPLE_STATEMENT() {
+	if (ASSIGNEMENT_OR_PROCEDURE_CALL_STATEMENT()) return true;
+	else if (SIMPLE_RETURN_STATEMENT()) return true;
 	else return false;
 }
 
 
 // TODO 
-boolean COMPOUND_STATEMENT() {
+static boolean COMPOUND_STATEMENT() {
 	return false;
 }
 
 
 /**
- * ASSIGNEMENT_STATEMENT ::= name := EXPRESSION
+ * ASSIGNEMENT_OR_PROCEDURE_CALL_STATEMENT ::= name ASSIGNEMENT_OR_PROCEDURE_CALL_END_STATEMENT
  */
-boolean ASSIGNEMENT_STATEMENT() {
-	// Reading an identifier
-	if (current_symbol.code != ID_TOKEN) 
+static boolean ASSIGNEMENT_OR_PROCEDURE_CALL_STATEMENT() {
+	if (current_symbol.code != ID_TOKEN)
 		return false;
-	
+
 	next_symbol();
 
+	// reading the next grammar
+	ASSIGNEMENT_OR_PROCEDURE_CALL_END_STATEMENT();
+
+	return true;
+}
+
+/**
+ * ASSIGNEMENT_OR_PROCEDURE_CALL_END_STATEMENT ::= ASSIGNEMENT_STATEMENT | PROCEDURE_CALL_STATEMENT
+ */
+static boolean ASSIGNEMENT_OR_PROCEDURE_CALL_END_STATEMENT() {
+	if (ASSIGNEMENT_STATEMENT()) return true;
+	else if (PROCEDURE_CALL_STATEMENT()) return true;
+	else return false;
+}
+
+/**
+ * ASSIGNEMENT_STATEMENT ::= := EXPRESSION
+ */
+static boolean ASSIGNEMENT_STATEMENT() {
 	// Reaading the affectation symbol
 	if (current_symbol.code != AFFECTATION_TOKEN) 
-		raise_error(AFFECTATION_SYMBOL_EXPECTED_ERROR);
+		return false;
 
 	next_symbol();
 
 	// Reading an expression
 	EXPRESSION();
 
+	if (current_symbol.code != SEMICOLON_TOKEN)
+		raise_error(SEMICOLON_EXPECTED_ERROR);
+
+	next_symbol();
+
+	printf("Finished reading an assignement statement \n");
+
+	return true;
+}
+
+static boolean PROCEDURE_CALL_STATEMENT() {
+	if (current_symbol.code != SEMICOLON_TOKEN)
+		return false;
+
+	next_symbol();
+
+	printf("Finished reading a procedure call \n");
+
 	return true;
 }
 
 
 /**
- * EXIT_STATEMENT ::= exit [LOOP_NAME] [WHEN CONDITION]
+ * EXIT_STATEMENT ::= exit [LOOP_NAME] [when CONDITION]
  */
-boolean EXIT_STATEMENT() {
+static boolean EXIT_STATEMENT() {
 	// Reading the exit keyword 
 	if (current_symbol.code != EXIT_TOKEN) return false;
 	next_symbol();
@@ -151,15 +190,33 @@ boolean EXIT_STATEMENT() {
 }
 
 
+/*
+ * SIMPLE_RETURN_STATEMENT ::= return [EXPRESSION] ;
+ */
+static boolean SIMPLE_RETURN_STATEMENT() {
+	if (current_symbol.code != RETURN_TOKEN) return false;
+	next_symbol();
+
+	EXPRESSION();
+
+	if (current_symbol.code != SEMICOLON_TOKEN) raise_error(SEMICOLON_EXPECTED_ERROR);
+	next_symbol();
+
+	printf("Finished reading return statement \n");	
+
+	return true;
+}
+
+
 // TODO coding the condition grammar
-boolean EXPRESSION() {
+static boolean EXPRESSION() {
 	next_symbol();
 	return false;
 }
 
 
 // TODO coding the condition grammar
-boolean CONDITION() {
+static boolean CONDITION() {
 	next_symbol();
 	return false;
 }

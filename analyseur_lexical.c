@@ -348,7 +348,7 @@ static void read_character() {
  */
 static void read_end_of_file() {
 	strcpy(current_symbol.word, "END OF FILE");
-	assign_token(NOTHING);
+	assign_token(EOF_TOKEN);
 }
 
 

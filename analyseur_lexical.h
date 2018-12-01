@@ -82,7 +82,6 @@ static char keywords[TOKEN_LIST_SIZE][20] = {
 	"while", 
 	"with", 
 	"xor",
-	"EOF",
 
 	// Symbols used in the language
 
@@ -98,6 +97,7 @@ static char keywords[TOKEN_LIST_SIZE][20] = {
 	"<=",
 	"(",
 	")",
+	";",
 };
 
 

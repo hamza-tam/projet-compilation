@@ -8,7 +8,7 @@
 
 
 #define WORD_LENGTH 200+1
-#define TOKEN_LIST_SIZE 86
+#define TOKEN_LIST_SIZE 87
 
 // Declaring a boolean
 typedef enum _boolean {
@@ -96,7 +96,6 @@ typedef enum _token_list {
 	WHILE_TOKEN , 
 	WITH_TOKEN , 
 	XOR_TOKEN,
-	EOF_TOKEN ,
 
 	// Token used for the symbols of the language
 	EQUAL_TOKEN, 
@@ -111,6 +110,7 @@ typedef enum _token_list {
 	LESS_EQUAL_TOKEN,
 	OPEN_PARENTHESIS_TOKEN,
 	CLOSE_PARENTHESIS_TOKEN,
+	SEMICOLON_TOKEN,
 
 
 	// Special tokens
@@ -123,6 +123,7 @@ typedef enum _token_list {
 
 	// SEPARATOR TOKEN
 	SEPARATOR_TOKEN,
+	EOF_TOKEN,
 } token;
 
 
@@ -133,13 +134,34 @@ struct _symbol {
 };
 
 
+// Type of the symbols that will be stored in the tanle of symbols
+typedef enum _symbol_type {
+	TVAR,
+	TPROS,
+} symbol_type;
+
+
+// Symbol structure that will be stored in the table of symbols
+struct _stored_symbol {
+	char word[WORD_LENGTH];
+	enum _symbol_type type;
+	int address;
+	int length;
+};
+
+
 // Variable declaration
 FILE* file;
 
 char current_char;
 struct _symbol current_symbol;
 
+int symbol_table_size;
+int symbol_table_max_size;
+struct _stored_symbol *symbol_table;
+
 int current_line;
+int offset;
 
 
 #endif
