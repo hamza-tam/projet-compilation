@@ -11,10 +11,15 @@ boolean PROGRAM() {
 	// Reading the first token
 	next_symbol();
 
-	// Trying to find the grammar to execute
-	if (HANDLED_STATEMENT_OF_SEQUENCE()) return true;
+	boolean result = false;
 
-	return false;
+	// Trying to find the grammar to execute
+	if (HANDLED_STATEMENT_OF_SEQUENCE()) result = true;
+
+	// Showing the symbol table
+	show_symbol_table();
+
+	return result;
 }
 
 
@@ -117,6 +122,8 @@ static boolean ASSIGNEMENT_OR_PROCEDURE_CALL_STATEMENT() {
 	if (current_symbol.code != ID_TOKEN)
 		return false;
 
+	add_symbol(TVAR);
+	
 	next_symbol();
 
 	// reading the next grammar

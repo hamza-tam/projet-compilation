@@ -27,7 +27,6 @@ static void change_size() {
 boolean add_symbol(symbol_type t) {
 	// Checking first that the symbol extsts in the symbol table
 	if (symbol_exists() == -1) {
-		symbol_table_size++;
 		// If there are no more space in the symbol table
 		if (symbol_table_size > symbol_table_max_size) {
 			change_size();
@@ -35,6 +34,9 @@ boolean add_symbol(symbol_type t) {
 		// adding the symbol to the table
 		strcpy(symbol_table[symbol_table_size].word, current_symbol.word);
 		symbol_table[symbol_table_size].type = t;
+		
+		// Incrementing the symbol table size
+		symbol_table_size++;
 	} 
 	else 
 		return false;
@@ -53,4 +55,18 @@ int symbol_exists() {
 	}
 
 	return -1;
+}
+
+
+/*
+ * Printing into the screen the symbol table
+ */
+void show_symbol_table() {
+	printf("===============================\n");
+	printf("Symbol table \n");
+	printf("===============================\n");
+
+	for(int i = 0; i < symbol_table_size; i++) {
+		printf("--> %s \n", symbol_table[i].word);
+	}
 }
