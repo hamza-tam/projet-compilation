@@ -273,4 +273,4 @@ static boolean  RELATION_OPERATOR(){
 	else return false;
 	
 }
-static boolean  _NAME(){return false;}
+static boolean  _NAME();

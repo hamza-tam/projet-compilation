@@ -1,0 +1,26 @@
+#ifndef ANALYSEUR_LEXICAL_H
+#define ANALYSEUR_LEXICAL_H
+
+
+#include "global.h"
+#include "analyseur_lexical.h"
+#include "errors.h"
+
+static void ASSIGNEMENT_STATEMENT();
+static void EXIT_STATEMENT();
+static void PROCEDURE_CALL_STATEMENT();
+static void SIMPLE_RETURN_STATEMENT();
+static void IF_STATEMENT();
+static void EXPRESSION();
+static void RELATION();
+static void SIMPLE_EXPRESSION();
+static void TERM();
+static void FACTOR();
+static void PRIMARY();
+static void UNARY_ADDING_OPERATOR();
+static void BINARY_ADDING_OPERATOR();
+static void MULTIPLYING_OPERATOR();
+static void CONDITION();
+static void RELATION_OPERATOR();
+static void _NAME();
+#endif
