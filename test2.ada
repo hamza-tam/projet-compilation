@@ -1,12 +1,6 @@
-with Text_IO; use Text_IO;      
-
-
-procedure Hello is
-	N : Integer := 34.45;             
-begin
-	Put_Line("Hello, World!");
-
-	if N >= 0:
-
-end Hello;
-
+if a=b then
+ a:= -3+4;
+ b:= a or (5 mod d);
+ c:= v and  (5 rem d) ;
+ d:= h xor m;
+end if ;
