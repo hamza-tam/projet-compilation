@@ -15,7 +15,7 @@ boolean PROGRAM() {
 	boolean result = false;
 
 	// Trying to find the grammar to execute
-	if (HANDLED_STATEMENT_OF_SEQUENCE()) result = true;
+	if (SUBPROGRAM_BODY()) result = true;
 
 	// Showing the symbol table
 	show_symbol_table();
@@ -24,12 +24,134 @@ boolean PROGRAM() {
 }
 
 
-/*******************************************************
-********************************************************
+//******************************************************
+//********************************************************
 			
-			SYNTACTIC ANALYZER FUNCTIONS
+//			SYNTACTIC ANALYZER FUNCTIONS
+	
+//SUBPROGRAM_BODY := SUBPROGRAM_SPECIFICATION is DECLARATIVE_PART begin HANDLED_STATEMENT_OF_SEQUENCE end  [DESIGNATOR];
+static boolean SUBPROGRAM_BODY(){
+	
+	if(!SUBPROGRAM_SPECIFICATION()) return false;
+	
+	if (current_symbol.code != IS_TOKEN) raise_error(IS_EXPECTED_ERROR);
+	next_symbol();
 
-********************************************************
+	if(!DECLARATIVE_PART())	return false;
+
+	if (current_symbol.code != BEGIN_TOKEN)	raise_error(BEGIN_EXPECTED_ERROR);
+	next_symbol();
+	
+	if(!HANDLED_STATEMENT_OF_SEQUENCE()) return false;
+	
+	if (current_symbol.code != END_TOKEN) raise_error(END_EXPECTED_ERROR);
+	next_symbol(); 
+	
+	DESIGNATOR();
+	return true;
+		
+} 
+
+//SUBPROGRAM_SPECIFICATION := PROCEDURE_SPECIFICATION | FUNCTION_SPECIFICATION
+static boolean SUBPROGRAM_SPECIFICATION () {
+	
+	if (PROCEDURE_SPECIFICATION()) return true;
+	else if (SUBPROGRAM_SPECIFICATION()) return true;
+	else return false;
+	
+}
+
+//PROCEDURE_SPECIFICATION :=  procudure DPUN PARAMETER_PROFILE
+static boolean PROCEDURE_SPECIFICATION(){	
+
+	if (current_symbol.code != PROCEDURE_TOKEN)  raise_error(PROCEDURE_EXPECTED_ERROR);
+	next_symbol();
+
+	if(DPUN()){
+		if(PARAMETER_PROFILE()) return true;
+	}
+		
+	return false;	
+} 
+
+
+//DPUN := [PARENT_UNIT_NAME] DEFINING_IDENTIFIER 
+static boolean DPUN(){	
+
+	PARENT_UNIT_NAME();
+	
+	if(DEFINING_IDENTIFIER()) return true;	
+	return false;	
+} 
+
+
+// DEFINING_IDENTIFIER := IDENTIFIER
+static boolean DEFINING_IDENTIFIER(){	
+
+	if(IDENTIFIER()) return true;	
+	return false;	
+} 
+
+
+//PARAMETER_PROFILE := FORMAT_PART
+static boolean PARAMETER_PROFILE() {
+	if(FORMAT_PART(); return true;
+	return false;
+}
+
+//FORMAT_PART := (PARAMETER_SPECIFICATION{;PARAMETER_SPECIFICATION})
+static boolean FORMAT_PART() {
+
+	if (current_symbol.code != PO_TOKEN)  raise_error(PO_EXPECTED_ERROR);
+	next_symbol();
+	
+	if (!PARAMETER_SPECIFICATION()) return false;
+
+	while(PARAMETER_SPECIFICATION());
+
+	if (current_symbol.code != PF_TOKEN)  raise_error(PF_EXPECTED_ERROR);
+	next_symbol();
+	
+	return true;
+	
+}
+
+
+//PARAMETER_SPECIFICATION ::= DEFINING_IDENTIFIER_LIST:MODE 
+static boolean PARAMETER_SPECIFICATION() {
+	if(!DEFINING_IDENTIFIER_LIST()) return false;
+	
+	if (current_symbol.code != DEUXPOINT_TOKEN) raise_error(DEUXPOINT_EXPECTED_ERROR) ;
+	next_symbol();
+
+	if(!MODE()) return false;
+	return true;
+}
+
+
+//DEFINING_IDENTIFIER_LIST :: = DEFINING_IDENTIFIER
+static boolean DEFINING_IDENTIFIER_LIST() {
+	if(DEFINING_IDENTIFIER()) return true;
+	return false;
+}
+
+//MODE ::= IN | INOUT|OUT |epsilon
+static boolean MODE() {
+	
+	if (current_symbol.code != IN_TOKEN) {
+			if (current_symbol.code != INOUT_TOKEN) {
+					if (current_symbol.code != OUT_TOKEN) {
+						return true;
+					}
+			}
+	}
+
+	next_symbol();
+	return true;
+}
+
+
+/********************************************************
 *******************************************************/
 
 /**
