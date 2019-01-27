@@ -6,6 +6,7 @@ char* errors[ERRORS_NUMBER] = {
 	"Unrecognized character",
 	"A single quote was expected",
 	"A character was expected",
+	
 };
 
 
