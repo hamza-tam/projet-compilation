@@ -4,6 +4,7 @@
 
 #include "analyseur_lexical.h"
 #include "symbol_table.h"
+#include "pseudo_code.h"
 
 
 boolean PROGRAM();

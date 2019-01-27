@@ -7,6 +7,7 @@ boolean PROGRAM() {
 	// Initialization
 	init_symbol();
 	init_symbol_table();
+	_pseudo_code_init();
 
 	// Reading the first token
 	next_symbol();
@@ -18,6 +19,11 @@ boolean PROGRAM() {
 
 	// Showing the symbol table
 	show_symbol_table();
+
+	/* showing the pseudo code */
+	_pseudo_code_add_inst(MUL, 2);
+	_pseudo_code_print();
+	_pseudo_code_write();
 
 	return result;
 }
@@ -122,8 +128,11 @@ static boolean ASSIGNEMENT_OR_PROCEDURE_CALL_STATEMENT() {
 	if (current_symbol.code != ID_TOKEN)
 		return false;
 
-	add_symbol(TVAR);
+	if (symbol_exists() == -1) {
+		raise_error(SYMBOL_NOT_FOUND_ERROR);
+	}
 	
+	add_symbol(TVAR);
 	next_symbol();
 
 	// reading the next grammar
