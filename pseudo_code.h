@@ -28,6 +28,7 @@ typedef enum _pcode_inst {
 	NOP, /* No operation */
 	PRI,
 	PRC,
+	NEG, /* Change the number to its negative */
 } pcode_inst;
 
 

@@ -1,6 +1,7 @@
 procedure test (p:in) is 
  v : integer;
- v : integer;
+ a : integer;
 begin 
-	v:= 3 + 4;
+	a:= 5+3*7 + (6-3);
+	v:= 2 - 1;
 end ;
