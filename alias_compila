@@ -1,0 +1,4 @@
+alias "m=make"
+alias "mi=make interpreteur"
+alias "c=./compilateur"
+alias "i=./interpreteur"
