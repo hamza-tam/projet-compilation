@@ -352,8 +352,50 @@ static boolean CASE_STATEMENT() {
 	return false;
 }
 
+
+/**
+
+loop_statement ::= loop sequence_of_statements end loop ;
+*/
 static boolean LOOP_STATEMENT() {
-	return false;
+	if(current_symbol.code!=LOOP_TOKEN) return false;	
+	next_symbol();
+
+
+	/**
+	 * generate pseudo code
+	*/
+	int indice_brn = line_number;
+	
+	
+	if(!SEQUENCE_OF_STATEMENT()){
+		raise_error(SEQUENCE_STATEMENT_ERROR);
+	}
+
+	/**
+	 * generate pseudo code
+	*/
+	_pseudo_code_add_inst(BRN,indice_brn);
+
+
+	if(current_symbol.code!=END_TOKEN) {
+
+		raise_error(END_EXPECTED_ERROR);
+	}
+
+	next_symbol();
+
+	if(current_symbol.code!=LOOP_TOKEN) {
+			raise_error(LOOP_EXPECTED_ERROR);
+	}
+		next_symbol();
+
+	if(current_symbol.code!=SEMICOLON_TOKEN) {
+		raise_error(SEMICOLON_EXPECTED_ERROR);
+	}
+	next_symbol();
+		
+	return true;
 }
 
 
@@ -442,6 +484,7 @@ static boolean EXIT_STATEMENT() {
 	if (current_symbol.code == WHEN_TOKEN) {
 		next_symbol();
 		if(!CONDITION()) raise_error(CONDITION_ERROR);
+		_pseudo_code_add_inst(BZE,-1);
 	}
 
 	return true;
