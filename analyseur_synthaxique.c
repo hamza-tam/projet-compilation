@@ -40,10 +40,16 @@ boolean PROGRAM() {
 //SUBPROGRAM_BODY := SUBPROGRAM_SPECIFICATION is DECLARATIVE_PART begin HANDLED_STATEMENT_OF_SEQUENCE end  [DESIGNATOR];
 static boolean SUBPROGRAM_BODY(){
 	
+	/* The identifiers declared now are not variables */
+	state = PROCEDURE_NAME;
+
 	if(!SUBPROGRAM_SPECIFICATION()) return false;
 	
 	if (current_symbol.code != IS_TOKEN) raise_error(IS_EXPECTED_ERROR);
 	next_symbol();
+
+	/* The identifiers declared now can be variables */
+	state = VARIABLE_NAME;
 
 	if(!DECLARATIVE_PART())	raise_error(DECLARATIVE_PART_ERROR);
 
@@ -101,9 +107,15 @@ static boolean DEFINING_IDENTIFIER(){
 	/**
 	 * Ajout dans la table des symboles
 	 */
-	// NOUHAS TAATZIDIHA
-	add_symbol(TVAR);
-	_pseudo_code_add_inst(INT, 1);
+	if (symbol_exists() != -1) {
+		raise_error(SYMBOL_EXISTS_ERROR);		
+	} else {
+		if (state == PROCEDURE_NAME) add_symbol(TPROC);
+		else if (state == VARIABLE_NAME) {
+			add_symbol(TVAR); 
+			_pseudo_code_add_inst(INT, 1);
+		}
+	}
 
 	next_symbol();
 	
@@ -122,7 +134,6 @@ static boolean PARAMETER_PROFILE() {
 
 //FORMAT_PART := (PARAMETER_SPECIFICATION{;PARAMETER_SPECIFICATION})
 static boolean FORMAT_PART() {
-	printf("here\n");
 	if (current_symbol.code != OPEN_PARENTHESIS_TOKEN)  return false;
 	next_symbol();
 
@@ -144,15 +155,10 @@ static boolean FORMAT_PART() {
 
 //PARAMETER_SPECIFICATION ::= DEFINING_IDENTIFIER_LIST:MODE 
 static boolean PARAMETER_SPECIFICATION() {
-	printf("debug 1\n");
 	if(!DEFINING_IDENTIFIER_LIST()) return false;
-		printf("debug 2\n");
-	if (current_symbol.code != DEUXPOINTS_TOKEN) { printf("ereuueueueuuue\n");raise_error(DEUXPOINTS_EXPECTED_ERROR);}
-	printf("debug 3\n");
+	if (current_symbol.code != DEUXPOINTS_TOKEN) raise_error(DEUXPOINTS_EXPECTED_ERROR);
 	next_symbol();
-	printf("debug 4\n");
 	if(!MODE()) raise_error(MODE_ERROR);
-		printf("debug 5\n");
 	return true;
 }
 
@@ -165,7 +171,6 @@ static boolean DEFINING_IDENTIFIER_LIST() {
 
 //MODE ::= IN | INOUT |OUT |epsilon
 static boolean MODE() {
-	printf("mode fct debut\n");
 	if (current_symbol.code != IN_TOKEN) {
 			if (current_symbol.code != INOUT_TOKEN) {
 					if (current_symbol.code != OUT_TOKEN) {
@@ -173,9 +178,7 @@ static boolean MODE() {
 					}
 			}
 	}
-	printf("mode fct 1\n");
 	next_symbol();
-	printf("mode fct fct2\n");
 	return true;
 }
 
@@ -374,7 +377,7 @@ static boolean LOOP_STATEMENT() {
  */
 static boolean ASSIGNEMENT_OR_PROCEDURE_CALL_STATEMENT() {
 	if (current_symbol.code != ID_TOKEN) return false;
-	_pseudo_code_add_inst(LDA, symbol_exists());
+	_pseudo_code_add_inst(LDA, get_address());
 	next_symbol();
 	if(!ASSIGNEMENT_OR_PROCEDURE_CALL_END_STATEMENT()) raise_error(ASSIGNEMENT_OR_PROCEDURE_CALL_END_STATEMENT_ERROR);
 
@@ -463,8 +466,6 @@ static boolean SIMPLE_RETURN_STATEMENT() {
 	if (current_symbol.code != SEMICOLON_TOKEN) raise_error(SEMICOLON_EXPECTED_ERROR);
 	next_symbol();
 
-	printf("Finished reading return statement \n");	
-
 	return true;
 }
 
@@ -481,6 +482,8 @@ static boolean IF_STATEMENT(){
 	if(!CONDITION()){
 		raise_error(CONDITION_ERROR);
 	}
+
+	_pseudo_code_add_inst(BZE, -1);//Mery
 
 	if(current_symbol.code!=THEN_TOKEN) 
 		raise_error(THEN_EXPECTED_ERROR);
@@ -509,6 +512,7 @@ static boolean IF_STATEMENT(){
 		}
 
 	}
+		_pseudo_code_fix_bze();//Mery
 
 	if(current_symbol.code == ELSE_TOKEN) {
 		next_symbol();
@@ -531,12 +535,10 @@ static boolean IF_STATEMENT(){
 	next_symbol();
 	
 	
-	_pseudo_code_fix_bze();//Mery
+
 
 	
-	printf(" fin de if statement \n " );
 	return true;
-
 }
 
 /*
@@ -606,8 +608,8 @@ static boolean RELATION(){
 			raise_error(SIMPLE_EXPRESSION_ERROR);
 		}
 		if (op == EQUAL_TOKEN) _pseudo_code_add_inst(EQL, 0);//Mery
-		_pseudo_code_add_inst(BZE, 0);//Mery		
-	
+				
+	}
 
 	return true;
 }
@@ -617,10 +619,12 @@ static boolean RELATION(){
  */
 
 static boolean SIMPLE_EXPRESSION(){
-			printf("SIMPLE_EXPRESSION\n");
-	UNARY_ADDING_OPERATOR();
+	token sig = current_symbol.code;
+	boolean add_sig = UNARY_ADDING_OPERATOR();
 
 	if(!TERM()) return false;
+
+	if (add_sig) if (sig == SUBSTRACT_TOKEN) _pseudo_code_add_inst(NEG, 0);
 
 	token op;
 
@@ -629,8 +633,8 @@ static boolean SIMPLE_EXPRESSION(){
 	while (BINARY_ADDING_OPERATOR()){
 		if(!TERM()) raise_error(TERM_ERROR);				
 		
-		if (op == PLUS_TOKEN)
-			_pseudo_code_add_inst(ADD, 0);
+		if (op == PLUS_TOKEN) _pseudo_code_add_inst(ADD, 0);
+		else _pseudo_code_add_inst(SUB, 0);
 
 		op = current_symbol.code;
 	}
@@ -645,9 +649,16 @@ static boolean SIMPLE_EXPRESSION(){
 static boolean TERM(){
 			printf("TERM\n");
 	if(!FACTOR()) return false;
-		
+	
+	token op = current_symbol.code;
+
 	while (MULTIPLYING_OPERATOR()){
 		if(!FACTOR()) raise_error(FACTOR_ERROR);	
+		/* Evaluating the value of the operator */
+		if (op == MULTIPLY_TOKEN) _pseudo_code_add_inst(MUL, 0);
+		if (op == DIVIDE_TOKEN) _pseudo_code_add_inst(DIV, 0);
+
+		op = current_symbol.code;
 	}
 	
 	return true;
@@ -680,15 +691,17 @@ static boolean FACTOR() {
 static boolean PRIMARY(){
 			printf("PRIMARY\n");
 	if(current_symbol.code==INTEGER_TOKEN || current_symbol.code==REAL_NUMBER_TOKEN) { 
+		/* The case where we are using numbers */
 		_pseudo_code_add_inst(LDI, atoi(current_symbol.word));
 		next_symbol(); return true;
 	}
 	else if(current_symbol.code==NULL_TOKEN) { next_symbol(); return true;}
-	else if(current_symbol.code==ID_TOKEN) {
-	
-		_pseudo_code_add_inst(LDA, symbol_exists()); //Mery
-		next_symbol(); 
-		return true;}
+	else if(current_symbol.code==ID_TOKEN) { 
+		_pseudo_code_add_inst(LDA, get_address());
+		_pseudo_code_add_inst(LDV, 0);
+		next_symbol();
+		return true;
+	}
 	else if(current_symbol.code==STRING_TOKEN) { next_symbol(); return true;}
 	else if(current_symbol.code==CHAR_TOKEN) { next_symbol(); return true;}
 

@@ -28,6 +28,7 @@ typedef enum _pcode_inst {
 	NOP, /* No operation */
 	PRI,
 	PRC,
+	NEG, /* Change the number to its negative */
 } pcode_inst;
 
 
@@ -82,5 +83,8 @@ void _pseudo_code_read_text();
 
 /* Printing the pseudo code */
 void _pseudo_code_print();
+
+/* Adding the parameter to the BZE instruction */
+void _pseudo_code_fix_bze();
 
 #endif

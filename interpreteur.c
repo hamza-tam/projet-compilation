@@ -76,21 +76,21 @@ void _interpret_pseudo_code() {
 
 		case SUB:
 			hold = _pile_top();
-			hold -= _pile_top();
+			hold = _pile_top() - hold;
 			_pile_add(hold);
 			pc++;
 			break;
 
 		case MUL:
 			hold = _pile_top();
-			hold *= +_pile_top();
+			hold *= _pile_top();
 			_pile_add(hold);
 			pc++;
 			break;
 
 		case DIV:
 			hold = _pile_top();
-			hold /= _pile_top();
+			hold = _pile_top() / hold;
 			_pile_add(hold);
 			pc++;
 			break;
@@ -171,7 +171,7 @@ void _interpret_pseudo_code() {
 			break;
 
 		case BZE:
-			if (_pile_top == 0) pc = (int) current_node->line.parameter;
+			if (_pile_top() == 0) pc = (int) current_node->line.parameter;
 			else pc++;
 			break;
 
@@ -190,6 +190,11 @@ void _interpret_pseudo_code() {
 
 		case PRC:
 			printf("%c", (char) _pile_top());
+			pc++;
+			break;
+
+		case NEG:
+			_pile_add((-1) * _pile_top());
 			pc++;
 			break;
 

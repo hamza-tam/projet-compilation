@@ -109,3 +109,21 @@ void _pseudo_code_print() {
 
 	printf("\nEND OF PSEUDO CODE\n");
 }
+
+
+void _pseudo_code_fix_bze() {
+	boolean fixed = false;
+
+	node *n = current_pcode;
+
+	/* looking for a BZE with a missing argument */
+	while (n != NULL && !fixed) {
+		if (n->line.inst == BZE && n->line.parameter == -1) {
+			printf("msgipojjojoiioko;m:l;l;kml;,mkl;lknkhbjgkv\n");
+			fixed = true;
+			n->line.parameter = line_number;
+		}
+		/* Going to the previous instruction */
+		n = n->previous;
+	}	
+}
