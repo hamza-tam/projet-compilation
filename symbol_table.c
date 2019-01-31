@@ -7,6 +7,7 @@
 void init_symbol_table() {
 	symbol_table_size = 0;
 	symbol_table_max_size = 10;
+	current_address = 0;
 
 	symbol_table = malloc(symbol_table_max_size * sizeof(struct _stored_symbol));
 }
@@ -34,6 +35,8 @@ boolean add_symbol(symbol_type t) {
 		// adding the symbol to the table
 		strcpy(symbol_table[symbol_table_size].word, current_symbol.word);
 		symbol_table[symbol_table_size].type = t;
+
+		if (t == TVAR) symbol_table[symbol_table_size].address = current_address++;
 		
 		// Incrementing the symbol table size
 		symbol_table_size++;
@@ -51,6 +54,33 @@ boolean add_symbol(symbol_type t) {
 int symbol_exists() {
 	for (int i = 0; i < symbol_table_size; i++) {
 		if ( strcmp(symbol_table[i].word, current_symbol.word) == 0 ) 
+			return i;
+	}
+
+	return -1;
+}
+
+/*
+ * Get the adress of the current symbol
+ */
+int get_address() {
+	for (int i = 0; i < symbol_table_size; i++) {
+		if ( strcmp(symbol_table[i].word, current_symbol.word) == 0 ) 
+			return symbol_table[i].address;
+	}
+
+	return -1;
+}
+
+
+/*
+ * Check if a specific symbol already exists in the symbol table
+ * return the index of the symbol in the table if it exists
+ * or return -1 if the symbol does not exists in the table 
+ */
+int _specific_symbol_exists(char *symbol) {
+	for (int i = 0; i < symbol_table_size; i++) {
+		if ( strcmp(symbol_table[i].word, symbol) == 0 ) 
 			return i;
 	}
 

@@ -12,6 +12,7 @@ boolean PROGRAM() {
 	// Initialization
 	init_symbol();
 	init_symbol_table();
+	_pseudo_code_init();
 
 	// Reading the first token
 	next_symbol();
@@ -21,8 +22,11 @@ boolean PROGRAM() {
 	// Trying to find the grammar to execute
 	if (SUBPROGRAM_BODY()) result = true;
 
+	_pseudo_code_add_inst(HLT, 0);
+
 	// Showing the symbol table
 	show_symbol_table();
+	_pseudo_code_write_text();
 
 	return result;
 }
@@ -36,10 +40,16 @@ boolean PROGRAM() {
 //SUBPROGRAM_BODY := SUBPROGRAM_SPECIFICATION is DECLARATIVE_PART begin HANDLED_STATEMENT_OF_SEQUENCE end  [DESIGNATOR];
 static boolean SUBPROGRAM_BODY(){
 	
+	/* The identifiers declared now are not variables */
+	state = PROCEDURE_NAME;
+
 	if(!SUBPROGRAM_SPECIFICATION()) return false;
 	
 	if (current_symbol.code != IS_TOKEN) raise_error(IS_EXPECTED_ERROR);
 	next_symbol();
+
+	/* The identifiers declared now can be variables */
+	state = VARIABLE_NAME;
 
 	if(!DECLARATIVE_PART())	raise_error(DECLARATIVE_PART_ERROR);
 
@@ -93,6 +103,20 @@ static boolean DPUN(){
 static boolean DEFINING_IDENTIFIER(){	
 	
 	if (current_symbol.code != ID_TOKEN)  return false;
+	
+	/**
+	 * Ajout dans la table des symboles
+	 */
+	if (symbol_exists() != -1) {
+		raise_error(SYMBOL_EXISTS_ERROR);		
+	} else {
+		if (state == PROCEDURE_NAME) add_symbol(TPROC);
+		else if (state == VARIABLE_NAME) {
+			add_symbol(TVAR); 
+			_pseudo_code_add_inst(INT, 1);
+		}
+	}
+
 	next_symbol();
 	
 	return true;	
@@ -110,7 +134,6 @@ static boolean PARAMETER_PROFILE() {
 
 //FORMAT_PART := (PARAMETER_SPECIFICATION{;PARAMETER_SPECIFICATION})
 static boolean FORMAT_PART() {
-	printf("here\n");
 	if (current_symbol.code != OPEN_PARENTHESIS_TOKEN)  return false;
 	next_symbol();
 
@@ -132,15 +155,10 @@ static boolean FORMAT_PART() {
 
 //PARAMETER_SPECIFICATION ::= DEFINING_IDENTIFIER_LIST:MODE 
 static boolean PARAMETER_SPECIFICATION() {
-	printf("debug 1\n");
 	if(!DEFINING_IDENTIFIER_LIST()) return false;
-		printf("debug 2\n");
-	if (current_symbol.code != DEUXPOINTS_TOKEN) { printf("ereuueueueuuue\n");raise_error(DEUXPOINTS_EXPECTED_ERROR);}
-	printf("debug 3\n");
+	if (current_symbol.code != DEUXPOINTS_TOKEN) raise_error(DEUXPOINTS_EXPECTED_ERROR);
 	next_symbol();
-	printf("debug 4\n");
 	if(!MODE()) raise_error(MODE_ERROR);
-		printf("debug 5\n");
 	return true;
 }
 
@@ -153,7 +171,6 @@ static boolean DEFINING_IDENTIFIER_LIST() {
 
 //MODE ::= IN | INOUT |OUT |epsilon
 static boolean MODE() {
-	printf("mode fct debut\n");
 	if (current_symbol.code != IN_TOKEN) {
 			if (current_symbol.code != INOUT_TOKEN) {
 					if (current_symbol.code != OUT_TOKEN) {
@@ -161,9 +178,7 @@ static boolean MODE() {
 					}
 			}
 	}
-	printf("mode fct 1\n");
 	next_symbol();
-	printf("mode fct fct2\n");
 	return true;
 }
 
@@ -402,20 +417,9 @@ static boolean LOOP_STATEMENT() {
  * ASSIGNEMENT_OR_PROCEDURE_CALL_STATEMENT ::= name ASSIGNEMENT_OR_PROCEDURE_CALL_END_STATEMENT
  */
 static boolean ASSIGNEMENT_OR_PROCEDURE_CALL_STATEMENT() {
-	//printf("ASSIGNEMENT_OR_PROCEDURE_CALL_STATEMENT\n");
-	//printf("\n\n\n%i : %s \n\n\n",current_symbol.code, current_symbol.word);
-/*
-if (current_symbol.code == END_TOKEN) {
-	//printf("-----------------------------***********-------------------------------------------end l3rss\n");
-	return false;
-	}
-*/
 	if (current_symbol.code != ID_TOKEN) return false;
-	//printf("-----------------------------***********-------------------------------------------befoore\n");
-	//add_symbol(TVAR);
+	_pseudo_code_add_inst(LDA, get_address());
 	next_symbol();
-	//printf("-----------------------------***********-------------------------------------------after\n");
-	// reading the next grammar
 	if(!ASSIGNEMENT_OR_PROCEDURE_CALL_END_STATEMENT()) raise_error(ASSIGNEMENT_OR_PROCEDURE_CALL_END_STATEMENT_ERROR);
 
 	return true;
@@ -425,9 +429,9 @@ if (current_symbol.code == END_TOKEN) {
  * ASSIGNEMENT_OR_PROCEDURE_CALL_END_STATEMENT ::= ASSIGNEMENT_STATEMENT | PROCEDURE_CALL_STATEMENT
  */
 static boolean ASSIGNEMENT_OR_PROCEDURE_CALL_END_STATEMENT() {
-	if (ASSIGNEMENT_STATEMENT()) 
+	if (ASSIGNEMENT_STATEMENT()) {
 		return true;
-	else if (PROCEDURE_CALL_STATEMENT()) 
+	} else if (PROCEDURE_CALL_STATEMENT()) 
 		return true;
 	else 
 		return false;
@@ -446,6 +450,8 @@ static boolean ASSIGNEMENT_STATEMENT() {
 	// Reading an expression
 	if(!EXPRESSION()) 
 		raise_error(EXPRESSION_ERROR);
+	
+	_pseudo_code_add_inst(STO, 0);
 
 	if (current_symbol.code != SEMICOLON_TOKEN)
 		raise_error(SEMICOLON_EXPECTED_ERROR);
@@ -501,8 +507,6 @@ static boolean SIMPLE_RETURN_STATEMENT() {
 
 	if (current_symbol.code != SEMICOLON_TOKEN) raise_error(SEMICOLON_EXPECTED_ERROR);
 	next_symbol();
-
-	printf("Finished reading return statement \n");	
 
 	return true;
 }
@@ -570,9 +574,7 @@ static boolean IF_STATEMENT(){
 	next_symbol();
 
 	
-	printf(" fin de if statement \n " );
 	return true;
-
 }
 
 /*
@@ -647,12 +649,24 @@ static boolean RELATION(){
 
 static boolean SIMPLE_EXPRESSION(){
 	
-	UNARY_ADDING_OPERATOR();
+	token sig = current_symbol.code;
+	boolean add_sig = UNARY_ADDING_OPERATOR();
 
 	if(!TERM()) return false;
 
+	if (add_sig) if (sig == SUBSTRACT_TOKEN) _pseudo_code_add_inst(NEG, 0);
+
+	token op;
+
+	op = current_symbol.code;
+	
 	while (BINARY_ADDING_OPERATOR()){
 		if(!TERM()) raise_error(TERM_ERROR);				
+		
+		if (op == PLUS_TOKEN) _pseudo_code_add_inst(ADD, 0);
+		else _pseudo_code_add_inst(SUB, 0);
+
+		op = current_symbol.code;
 	}
 	
 	return true;
@@ -664,9 +678,16 @@ static boolean SIMPLE_EXPRESSION(){
 
 static boolean TERM(){
 	if(!FACTOR()) return false;
-		
+	
+	token op = current_symbol.code;
+
 	while (MULTIPLYING_OPERATOR()){
 		if(!FACTOR()) raise_error(FACTOR_ERROR);	
+		/* Evaluating the value of the operator */
+		if (op == MULTIPLY_TOKEN) _pseudo_code_add_inst(MUL, 0);
+		if (op == DIVIDE_TOKEN) _pseudo_code_add_inst(DIV, 0);
+
+		op = current_symbol.code;
 	}
 	
 	return true;
@@ -674,7 +695,6 @@ static boolean TERM(){
 
 /*
  * FACTOR ::= PRIMARY [** PRIMARY] 
- //**
  */
 
 static boolean FACTOR() {
@@ -698,9 +718,18 @@ static boolean FACTOR() {
 
 static boolean PRIMARY(){
 
-	if(current_symbol.code==INTEGER_TOKEN || current_symbol.code==REAL_NUMBER_TOKEN) { next_symbol(); return true;}
+	if(current_symbol.code==INTEGER_TOKEN || current_symbol.code==REAL_NUMBER_TOKEN) { 
+		/* The case where we are using numbers */
+		_pseudo_code_add_inst(LDI, atoi(current_symbol.word));
+		next_symbol(); return true;
+	}
 	else if(current_symbol.code==NULL_TOKEN) { next_symbol(); return true;}
-	else if(current_symbol.code==ID_TOKEN) { next_symbol(); return true;}
+	else if(current_symbol.code==ID_TOKEN) { 
+		_pseudo_code_add_inst(LDA, get_address());
+		_pseudo_code_add_inst(LDV, 0);
+		next_symbol();
+		return true;
+	}
 	else if(current_symbol.code==STRING_TOKEN) { next_symbol(); return true;}
 	else if(current_symbol.code==CHAR_TOKEN) { next_symbol(); return true;}
 

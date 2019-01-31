@@ -83,9 +83,8 @@ static void assign_token(token t) {
 		int i;
 		for (i = 0; i < TOKEN_LIST_SIZE; i++) {
 			if (strcmp(current_symbol.word, keywords[i]) == 0) {
-printf("***************");
 				current_symbol.code = i;
-				printf("AFF %i : %s \n", i, current_symbol.word);
+				printf("aff %i : %s \n", i, current_symbol.word);
 				break;
 			}
 		}

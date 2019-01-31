@@ -10,6 +10,14 @@
 #define WORD_LENGTH 200+1
 #define TOKEN_LIST_SIZE 88
 
+
+/**
+ * Definition of states
+ */
+#define PROCEDURE_NAME 		0
+#define VARIABLE_NAME 		1
+#define OTHER_NAME 			2
+
 // Declaring a boolean
 typedef enum _boolean {
 	false, true
@@ -100,8 +108,8 @@ typedef enum _token_list {
 
 	// Token used for the symbols of the language
 	EQUAL_TOKEN, 
-	PLUS_TOKEN,//75
-	SUBSTRACT_TOKEN, 
+	PLUS_TOKEN,//75 
+	SUBSTRACT_TOKEN,
 	MULTIPLY_TOKEN,
 	DIVIDE_TOKEN,
 	AFFECTATION_TOKEN, 
@@ -140,6 +148,7 @@ struct _symbol {
 typedef enum _symbol_type {
 	TVAR,
 	TPROC,
+	TOTH,
 } symbol_type;
 
 
@@ -168,5 +177,7 @@ struct _stored_symbol *symbol_table;
 int current_line;
 int offset;
 
+int state;
+int current_address;
 
 #endif

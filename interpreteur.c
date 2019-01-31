@@ -5,7 +5,7 @@ int pc = 1;
 
 int main(int argc, char** argv) {
 	/* Loading the file containing the Pcode */
-	strcpy(interpreter_input_file_name,"test.output");
+	strcpy(interpreter_input_file_name,"output");
 
 	_pseudo_code_init();
 	_pile_init();
@@ -76,21 +76,21 @@ void _interpret_pseudo_code() {
 
 		case SUB:
 			hold = _pile_top();
-			hold -= _pile_top();
+			hold = _pile_top() - hold;
 			_pile_add(hold);
 			pc++;
 			break;
 
 		case MUL:
 			hold = _pile_top();
-			hold *= +_pile_top();
+			hold *= _pile_top();
 			_pile_add(hold);
 			pc++;
 			break;
 
 		case DIV:
 			hold = _pile_top();
-			hold /= _pile_top();
+			hold = _pile_top() / hold;
 			_pile_add(hold);
 			pc++;
 			break;
@@ -190,6 +190,11 @@ void _interpret_pseudo_code() {
 
 		case PRC:
 			printf("%c", (char) _pile_top());
+			pc++;
+			break;
+
+		case NEG:
+			_pile_add((-1) * _pile_top());
 			pc++;
 			break;
 
