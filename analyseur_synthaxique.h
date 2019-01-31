@@ -8,17 +8,44 @@
 
 boolean PROGRAM();
 
+static boolean SUBPROGRAM_BODY();
+static boolean SUBPROGRAM_SPECIFICATION();
+static boolean PROCEDURE_SPECIFICATION();
+static boolean DPUN();
+static boolean DEFINING_IDENTIFIER();
+static boolean PARAMETER_PROFILE();
+static boolean FORMAT_PART();
+static boolean PARAMETER_SPECIFICATION();
+static boolean DEFINING_IDENTIFIER_LIST();
+static boolean MODE();
+
+static boolean DESIGNATOR();
+
 
 static boolean DECLARATIVE_PART();
 static boolean DECLARATIVE_ITEM();
 static boolean BASIC_DECLARATIVE_ITEM();
 static boolean BODY();
+static boolean BODY_STUB();
+
+static boolean PROPER_BODY();
+static boolean BASIC_DECLARATION ();
+static boolean PACKAGE_BODY();
+static boolean PROTECTED_BODY();
+static boolean OBJECT_DECLARATION ();
+static boolean SUBTYPE_INDICATION();
+
+
 
 static boolean HANDLED_STATEMENT_OF_SEQUENCE();
 static boolean SEQUENCE_OF_STATEMENT();
 static boolean STATEMENT();
 static boolean SIMPLE_STATEMENT();
 static boolean COMPOUND_STATEMENT();
+
+
+static boolean CASE_STATEMENT();
+static boolean LOOP_STATEMENT();
 
 static boolean ASSIGNEMENT_OR_PROCEDURE_CALL_STATEMENT();
 static boolean ASSIGNEMENT_OR_PROCEDURE_CALL_END_STATEMENT();

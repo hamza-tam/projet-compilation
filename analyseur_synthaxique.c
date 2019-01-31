@@ -1,9 +1,13 @@
 #include "analyseur_synthaxique.h"
-
+#include "errors.h"
 
 /**
  * The start of the syntactic analyzer
  */
+ 
+
+
+//PROGRAM := SUBPROGRAM_BODY
 boolean PROGRAM() {
 	// Initialization
 	init_symbol();
@@ -11,7 +15,7 @@ boolean PROGRAM() {
 
 	// Reading the first token
 	next_symbol();
-
+	
 	boolean result = false;
 
 	// Trying to find the grammar to execute
@@ -37,17 +41,17 @@ static boolean SUBPROGRAM_BODY(){
 	if (current_symbol.code != IS_TOKEN) raise_error(IS_EXPECTED_ERROR);
 	next_symbol();
 
-	if(!DECLARATIVE_PART())	return false;
+	if(!DECLARATIVE_PART())	raise_error(DECLARATIVE_PART_ERROR);
 
 	if (current_symbol.code != BEGIN_TOKEN)	raise_error(BEGIN_EXPECTED_ERROR);
 	next_symbol();
 	
-	if(!HANDLED_STATEMENT_OF_SEQUENCE()) return false;
+	if(!HANDLED_STATEMENT_OF_SEQUENCE()) raise_error(HANDLED_STATEMENT_OF_SEQUENCE_ERROR);
 	
 	if (current_symbol.code != END_TOKEN) raise_error(END_EXPECTED_ERROR);
 	next_symbol(); 
 	
-	DESIGNATOR();
+	//DESIGNATOR();
 	return true;
 		
 } 
@@ -56,60 +60,69 @@ static boolean SUBPROGRAM_BODY(){
 static boolean SUBPROGRAM_SPECIFICATION () {
 	
 	if (PROCEDURE_SPECIFICATION()) return true;
-	else if (SUBPROGRAM_SPECIFICATION()) return true;
+	//else if (FUNCTION_SPECIFICATION()) return true;
 	else return false;
 	
 }
 
-//PROCEDURE_SPECIFICATION :=  procudure DPUN PARAMETER_PROFILE
+//PROCEDURE_SPECIFICATION :=  procedure DPUN PARAMETER_PROFILE
 static boolean PROCEDURE_SPECIFICATION(){	
 
-	if (current_symbol.code != PROCEDURE_TOKEN)  raise_error(PROCEDURE_EXPECTED_ERROR);
+	if (current_symbol.code != PROCEDURE_TOKEN)  {return false;}
 	next_symbol();
 
-	if(DPUN()){
-		if(PARAMETER_PROFILE()) return true;
-	}
+	if(!DPUN()) raise_error(DPUN_ERROR); 
 		
-	return false;	
+	if(!PARAMETER_PROFILE()) raise_error(PARAMETER_PROFILE_ERROR);
+		
+	return true;	
 } 
 
 
 //DPUN := [PARENT_UNIT_NAME] DEFINING_IDENTIFIER 
 static boolean DPUN(){	
 
-	PARENT_UNIT_NAME();
+	//PARENT_UNIT_NAME();
 	
 	if(DEFINING_IDENTIFIER()) return true;	
 	return false;	
 } 
 
 
-// DEFINING_IDENTIFIER := IDENTIFIER
+// DEFINING_IDENTIFIER := id
 static boolean DEFINING_IDENTIFIER(){	
-
-	if(IDENTIFIER()) return true;	
-	return false;	
+	
+	if (current_symbol.code != ID_TOKEN)  return false;
+	next_symbol();
+	
+	return true;	
 } 
+
+
 
 
 //PARAMETER_PROFILE := FORMAT_PART
 static boolean PARAMETER_PROFILE() {
-	if(FORMAT_PART(); return true;
+	
+	if(FORMAT_PART()) return true;
 	return false;
 }
 
 //FORMAT_PART := (PARAMETER_SPECIFICATION{;PARAMETER_SPECIFICATION})
 static boolean FORMAT_PART() {
-
-	if (current_symbol.code != PO_TOKEN)  raise_error(PO_EXPECTED_ERROR);
+	printf("here\n");
+	if (current_symbol.code != OPEN_PARENTHESIS_TOKEN)  return false;
 	next_symbol();
-	
-	if (!PARAMETER_SPECIFICATION()) return false;
 
-	while(PARAMETER_SPECIFICATION());
+	if (!PARAMETER_SPECIFICATION()) raise_error(PARAMETER_SPECIFICATION_ERROR);
 
-	if (current_symbol.code != PF_TOKEN)  raise_error(PF_EXPECTED_ERROR);
+
+	while (current_symbol.code == SEMICOLON_TOKEN) {
+		next_symbol();
+		if(!PARAMETER_SPECIFICATION()) raise_error(PARAMETER_SPECIFICATION_ERROR);
+	}
+
+	if (current_symbol.code != CLOSE_PARENTHESIS_TOKEN)  raise_error(PF_EXPECTED_ERROR);
 	next_symbol();
 	
 	return true;
@@ -119,12 +132,15 @@ static boolean FORMAT_PART() {
 
 //PARAMETER_SPECIFICATION ::= DEFINING_IDENTIFIER_LIST:MODE 
 static boolean PARAMETER_SPECIFICATION() {
+	printf("debug 1\n");
 	if(!DEFINING_IDENTIFIER_LIST()) return false;
-	
-	if (current_symbol.code != DEUXPOINT_TOKEN) raise_error(DEUXPOINT_EXPECTED_ERROR) ;
+		printf("debug 2\n");
+	if (current_symbol.code != DEUXPOINTS_TOKEN) raise_error(DEUXPOINTS_EXPECTED_ERROR);
+	printf("debug 3\n");
 	next_symbol();
-
-	if(!MODE()) return false;
+	printf("debug 4\n");
+	if(!MODE()) raise_error(MODE_ERROR);
+		printf("debug 5\n");
 	return true;
 }
 
@@ -135,9 +151,9 @@ static boolean DEFINING_IDENTIFIER_LIST() {
 	return false;
 }
 
-//MODE ::= IN | INOUT|OUT |epsilon
+//MODE ::= IN | INOUT |OUT |epsilon
 static boolean MODE() {
-	
+	printf("mode fct debut\n");
 	if (current_symbol.code != IN_TOKEN) {
 			if (current_symbol.code != INOUT_TOKEN) {
 					if (current_symbol.code != OUT_TOKEN) {
@@ -145,8 +161,9 @@ static boolean MODE() {
 					}
 			}
 	}
-
+	printf("mode fct 1\n");
 	next_symbol();
+	printf("mode fct fct2\n");
 	return true;
 }
 
@@ -158,9 +175,9 @@ static boolean MODE() {
  * DECLARATIVE_PART ::= {DECLARATIVE ITEM}
  */
 static boolean DECLARATIVE_PART() {
-	DECLARATIVE_ITEM();
+	while(DECLARATIVE_ITEM()){}
 
-	return false;
+	return true;
 }
 
 
@@ -168,27 +185,104 @@ static boolean DECLARATIVE_PART() {
  * DECLARATIVE_ITEM ::= BASIC_DECLARATIVE_ITEM | BODY
  */
 static boolean DECLARATIVE_ITEM() {
-	BASIC_DECLARATIVE_ITEM();
+	if(!BASIC_DECLARATIVE_ITEM()){
+		if(!BODY()) return false;
+	}
 
-	return false;
+	return true;
 }
 
 
 /**
- * DECLARATIVE_ITEM ::= BASIC_DECLARATIVE_ITEM | BODY
+ * BASIC_DECLARATIVE_ITEM ::= BASIC_DECLARATION 
  */
-static boolean BASIC_DECLARATIVE_ITEM() {
-	BASIC_DECLARATIVE_ITEM();
+static boolean BASIC_DECLARATIVE_ITEM(){
 
-	return false;
+	if(!BASIC_DECLARATION()) return false;
+	
+	return true;
 }
 
-
-// TOFO Writing the grammar
+/**
+ * BODY ::= PROPER_BODY | BODY_STUB
+ */
 static boolean BODY() {
+	if(!PROPER_BODY()){
+		if(!BODY_STUB()) return false;
+	}
+	return true;
+}
+
+static boolean BODY_STUB(){
 	return false;
 }
 
+/**
+ * PROPER_BODY ::= SUBPROGRAM_BODY | PACKAGE_BODY | PROTECTED_BODY
+ */
+ 
+static boolean PROPER_BODY(){
+	
+ 	if(!SUBPROGRAM_BODY()){
+		if(!PACKAGE_BODY()){
+					if(!PROTECTED_BODY()) return false;
+		}
+	}
+ 	return true;
+}
+
+/**
+ * BASIC_DECLARATION ::= TYPE_DECLARATION | OBJECT_DECLARATION
+ */
+ 
+static boolean BASIC_DECLARATION () {
+	
+	if(!OBJECT_DECLARATION()) return false;
+	return true;
+}
+
+
+static boolean  PACKAGE_BODY(){
+	return false;
+}
+
+
+static boolean  PROTECTED_BODY(){
+	return false;
+}
+
+
+static boolean OBJECT_DECLARATION () {
+	
+	if(!DEFINING_IDENTIFIER_LIST()){
+		return false;
+	}
+	
+	if (current_symbol.code != DEUXPOINTS_TOKEN) {
+		raise_error(DEUXPOINTS_EXPECTED_ERROR);
+	}
+	
+	if (current_symbol.code == CONSTANT_TOKEN) {
+		
+	}
+	
+	if(!SUBTYPE_INDICATION()){
+		raise_error(SUBTYPE_INDICATION_ERROR);
+	}
+	
+	if (current_symbol.code == AFFECTATION_TOKEN) {
+		if(!EXPRESSION()) raise_error(EXPRESSION_ERROR);
+	}
+	
+		
+	return true;
+}
+
+// where we will define our types //int..
+static boolean SUBTYPE_INDICATION() {	
+	
+	return true;
+}
 
 /**
  * HANDLED_STATEMENT_OF_SEQUENCE ::= SEQUENCE_OF_STATEMENT
@@ -200,22 +294,27 @@ static boolean HANDLED_STATEMENT_OF_SEQUENCE() {
 
 
 /**
- * SEQUENCE_OF_STATEMENT ::= STATEMENT {STATEMENT} {LABEL}
+ * SEQUENCE_OF_STATEMENT ::= STATEMENT {STATEMENT} 
+ //{LABEL}
  */
 static boolean SEQUENCE_OF_STATEMENT() {
 	// Reading at least one statement grammar
 	if (!STATEMENT()) return false;
 
-	while(STATEMENT());
+	while(STATEMENT()){}
+	//while(LABEL()){}
 
 	return true;
 }
 
 /**
  * STATEMENT ::= {LABEL} SIMPLE_STATEMENT | {LABEL} COMPOUND_STATEMENT
+ //{LABEL}
  */
 static boolean STATEMENT() {
+	printf("debut Statement\n");
 	// Reading a simple statement or a compound statement
+	//while(LABEL()){}
 	if (SIMPLE_STATEMENT()) return true;
 	else if (COMPOUND_STATEMENT()) return true;
 	else return false;
@@ -223,19 +322,32 @@ static boolean STATEMENT() {
 
 
 /**
- * SIMPLE_STATEMENT ::= ASSIGNEMENT_STATEMENT | PRECEDURE_CALL_STATEMENT | EXIT_STATEMENT | SIMPLE_RETURN_STATEMENT
+ * SIMPLE_STATEMENT ::= ASSIGNEMENT_STATEMENT | PROCEDURE_CALL_STATEMENT | EXIT_STATEMENT | SIMPLE_RETURN_STATEMENT
  */
 static boolean SIMPLE_STATEMENT() {
+	printf("simple Statement\n");
 	if (ASSIGNEMENT_OR_PROCEDURE_CALL_STATEMENT()) return true;
 	else if (SIMPLE_RETURN_STATEMENT()) return true;
+	else if (PROCEDURE_CALL_STATEMENT()) return true;
+	else if (EXIT_STATEMENT()) return true;
 	else return false;
 }
 
 
-// COMPOUND_STATEMENT ::= IF_STATEMENT
+// COMPOUND_STATEMENT ::= IF_STATEMENT | CASE_STATEMENT | LOOP_STATEMENT
 static boolean COMPOUND_STATEMENT() {
-	
+	//printf("COMPOUND_STATEMENT\n");
 	if(IF_STATEMENT()) return true;
+	else if(CASE_STATEMENT()) return true;
+	else if(LOOP_STATEMENT()) return true;
+	return false;
+}
+
+static boolean CASE_STATEMENT() {
+	return false;
+}
+
+static boolean LOOP_STATEMENT() {
 	return false;
 }
 
@@ -244,15 +356,21 @@ static boolean COMPOUND_STATEMENT() {
  * ASSIGNEMENT_OR_PROCEDURE_CALL_STATEMENT ::= name ASSIGNEMENT_OR_PROCEDURE_CALL_END_STATEMENT
  */
 static boolean ASSIGNEMENT_OR_PROCEDURE_CALL_STATEMENT() {
-	if (current_symbol.code != ID_TOKEN)
-		return false;
-
-	add_symbol(TVAR);
-	
+	//printf("ASSIGNEMENT_OR_PROCEDURE_CALL_STATEMENT\n");
+	//printf("\n\n\n%i : %s \n\n\n",current_symbol.code, current_symbol.word);
+/*
+if (current_symbol.code == END_TOKEN) {
+	//printf("-----------------------------***********-------------------------------------------end l3rss\n");
+	return false;
+	}
+*/
+	if (current_symbol.code != ID_TOKEN) return false;
+	//printf("-----------------------------***********-------------------------------------------befoore\n");
+	//add_symbol(TVAR);
 	next_symbol();
-
+	//printf("-----------------------------***********-------------------------------------------after\n");
 	// reading the next grammar
-	ASSIGNEMENT_OR_PROCEDURE_CALL_END_STATEMENT();
+	if(!ASSIGNEMENT_OR_PROCEDURE_CALL_END_STATEMENT()) raise_error(ASSIGNEMENT_OR_PROCEDURE_CALL_END_STATEMENT_ERROR);
 
 	return true;
 }
@@ -261,9 +379,12 @@ static boolean ASSIGNEMENT_OR_PROCEDURE_CALL_STATEMENT() {
  * ASSIGNEMENT_OR_PROCEDURE_CALL_END_STATEMENT ::= ASSIGNEMENT_STATEMENT | PROCEDURE_CALL_STATEMENT
  */
 static boolean ASSIGNEMENT_OR_PROCEDURE_CALL_END_STATEMENT() {
-	if (ASSIGNEMENT_STATEMENT()) return true;
-	else if (PROCEDURE_CALL_STATEMENT()) return true;
-	else return false;
+	if (ASSIGNEMENT_STATEMENT()) 
+		return true;
+	else if (PROCEDURE_CALL_STATEMENT()) 
+		return true;
+	else 
+		return false;
 }
 
 /**
@@ -277,13 +398,13 @@ static boolean ASSIGNEMENT_STATEMENT() {
 	next_symbol();
 
 	// Reading an expression
-	EXPRESSION();
+	if(!EXPRESSION()) 
+		raise_error(EXPRESSION_ERROR);
 
 	if (current_symbol.code != SEMICOLON_TOKEN)
 		raise_error(SEMICOLON_EXPECTED_ERROR);
 
-	printf("Finished reading an assignement statement \n");
-
+	//printf("Finished reading an assignement statement \n");
 	next_symbol();
 
 	return true;
@@ -293,7 +414,7 @@ static boolean PROCEDURE_CALL_STATEMENT() {
 	if (current_symbol.code != SEMICOLON_TOKEN)
 		return false;
 
-	printf("Finished reading a procedure call \n");
+	//printf("Finished reading a procedure call \n");
 
 	next_symbol();
 
@@ -315,7 +436,7 @@ static boolean EXIT_STATEMENT() {
 	// Checking if there is a when + condition
 	if (current_symbol.code == WHEN_TOKEN) {
 		next_symbol();
-		CONDITION();
+		if(!CONDITION()) raise_error(CONDITION_ERROR);
 	}
 
 	return true;
@@ -340,56 +461,59 @@ static boolean SIMPLE_RETURN_STATEMENT() {
 }
 
 
-
-
-
-
-
-
-
 /*
  * IF_STATEMENT ::= if CONDITION then SEQUENCE_OF_STATEMENT {elseif CONDITION then SEQUENCE_OF_STATEMENT} [else SEQUENCE_OF_STATEMENT] end if;
  */
  
 static boolean IF_STATEMENT(){
-	
+
 	if(current_symbol.code!=IF_TOKEN) return false;
 	next_symbol();
-	
-	CONDITION();
-	
+
+	if(!CONDITION()){
+		raise_error(CONDITION_ERROR);
+	}
+
 	if(current_symbol.code!=THEN_TOKEN) 
 		raise_error(THEN_EXPECTED_ERROR);
 
 	next_symbol();
 
-	// TODO a revoir ??
-	SEQUENCE_OF_STATEMENT();
+	if(!SEQUENCE_OF_STATEMENT()){
+			raise_error(SEQUENCE_STATEMENT_ERROR);
+	}
 	
 	
-	// {elseif CONDITION then SEQUENCE_OF_STATEMENT}
+	// {else if CONDITION then SEQUENCE_OF_STATEMENT}
 	while(current_symbol.code==ELSIF_TOKEN){
 		next_symbol();
-
-		CONDITION();
 		
+		if(!CONDITION()){
+			raise_error(CONDITION_ERROR);
+		}
+			
 		if(current_symbol.code!=THEN_TOKEN) 
-			raise_error(THEN_EXPECTED_ERROR);
-		
+			raise_error(THEN_EXPECTED_ERROR);		
 		next_symbol();
-		
 	
+		if(!SEQUENCE_OF_STATEMENT()){
+			raise_error(SEQUENCE_STATEMENT_ERROR);
+		}
+
 	}
 
 	if(current_symbol.code == ELSE_TOKEN) {
 		next_symbol();
-		SEQUENCE_OF_STATEMENT();
+		if(!SEQUENCE_OF_STATEMENT()){
+			raise_error(SEQUENCE_STATEMENT_ERROR);
+		}
 	}
-		
+	
+
 	if(current_symbol.code!=END_TOKEN) 
 		raise_error(END_EXPECTED_ERROR);
 	next_symbol();
-	
+
 	if(current_symbol.code!=IF_TOKEN) 
 		raise_error(IF_EXPECTED_ERROR);
 	next_symbol();
@@ -397,13 +521,10 @@ static boolean IF_STATEMENT(){
 	if(current_symbol.code!=SEMICOLON_TOKEN) 
 		raise_error(SEMICOLON_EXPECTED_ERROR);
 	next_symbol();
-	
+
 	
 	printf(" fin de if statement \n " );
 	return true;
-	
-	
-		
 
 }
 
@@ -417,10 +538,11 @@ static boolean EXPRESSION(){
 	
 	// { and RELATION }
 	if(current_symbol.code==AND_TOKEN) {
-
 		while (current_symbol.code==AND_TOKEN){
 			next_symbol();
-			if(!RELATION()) return false;	
+			if(!RELATION()) {
+					raise_error(RELATION_EXPECTED_ERROR);
+			}
 			
 		}
 	
@@ -430,7 +552,9 @@ static boolean EXPRESSION(){
 	else if(current_symbol.code==OR_TOKEN) {
 		while (current_symbol.code==OR_TOKEN){
 			next_symbol();
-			if(!RELATION()) return false;	
+			if(!RELATION()) {
+					raise_error(RELATION_EXPECTED_ERROR);
+			}
 			
 		}
 	
@@ -440,7 +564,9 @@ static boolean EXPRESSION(){
 	else if (current_symbol.code==XOR_TOKEN) {
 		while (current_symbol.code==XOR_TOKEN){
 			next_symbol();
-			if(!RELATION()) return false;	
+			if(!RELATION()) {
+					raise_error(RELATION_EXPECTED_ERROR);
+			}
 			
 		}
 
@@ -459,16 +585,13 @@ static boolean RELATION(){
 
 	if(!SIMPLE_EXPRESSION()) return false;
 		
-	if (RELATION_OPERATOR() ){
-		next_symbol();
-		if(!SIMPLE_EXPRESSION()) return false;	
-			
+	if (RELATION_OPERATOR()){
+		if(!SIMPLE_EXPRESSION()) {
+					raise_error(SIMPLE_EXPRESSION_ERROR);
+		}		
 	}
-	
 
 	return true;
-	
-	
 }
 
 /*
@@ -477,21 +600,15 @@ static boolean RELATION(){
 
 static boolean SIMPLE_EXPRESSION(){
 	
-	if(UNARY_ADDING_OPERATOR()){
-		next_symbol();
-	}
+	UNARY_ADDING_OPERATOR();
+
 	if(!TERM()) return false;
 
 	while (BINARY_ADDING_OPERATOR()){
-		next_symbol();
-		if(!TERM()) return false;	
-			
+		if(!TERM()) raise_error(TERM_ERROR);				
 	}
 	
-
-	
 	return true;
-	
 }
 
 /*
@@ -502,19 +619,15 @@ static boolean TERM(){
 	if(!FACTOR()) return false;
 		
 	while (MULTIPLYING_OPERATOR()){
-		next_symbol();
-		if(!FACTOR()) return false;	
-			
+		if(!FACTOR()) raise_error(FACTOR_ERROR);	
 	}
 	
-
 	return true;
-	
-	
 }
 
 /*
  * FACTOR ::= PRIMARY [** PRIMARY] 
+ //**
  */
 
 static boolean FACTOR() {
@@ -533,7 +646,7 @@ static boolean FACTOR() {
 }
 
 /*
- * PRIMARY ::= READ_NUMBER  | null | name | STRING_LITERAL | (EXPRESSION) 
+ * PRIMARY ::= READ_NUMBER  | null | name | STRING_LITERAL | CHARACTER_LITERAL | (EXPRESSION) 
  */
 
 static boolean PRIMARY(){
@@ -542,18 +655,23 @@ static boolean PRIMARY(){
 	else if(current_symbol.code==NULL_TOKEN) { next_symbol(); return true;}
 	else if(current_symbol.code==ID_TOKEN) { next_symbol(); return true;}
 	else if(current_symbol.code==STRING_TOKEN) { next_symbol(); return true;}
+	else if(current_symbol.code==CHAR_TOKEN) { next_symbol(); return true;}
 
 	else if(current_symbol.code==OPEN_PARENTHESIS_TOKEN) { 
 		next_symbol(); 
-		if(EXPRESSION() && current_symbol.code==CLOSE_PARENTHESIS_TOKEN){
-			next_symbol();
-			return true;
+		if(!EXPRESSION()){
+			raise_error(EXPRESSION_ERROR);
+		} 		
+		if(current_symbol.code!=CLOSE_PARENTHESIS_TOKEN){
+			raise_error(CLOSE_PARENTHESIS_TOKEN_ERROR);
 		}
-		else return false;
+		else {
+			next_symbol();
+		}
+		return true;
 	}
 
 	else return false;
-	
 }
 
 /*
@@ -562,8 +680,8 @@ static boolean PRIMARY(){
 
 static boolean UNARY_ADDING_OPERATOR(){
 
-	if(current_symbol.code==PLUS_TOKEN) { return true;}
-	else if(current_symbol.code==SUBSTRACT_TOKEN) { return true;}
+	if(current_symbol.code==PLUS_TOKEN) { next_symbol();  true;}
+	else if(current_symbol.code==SUBSTRACT_TOKEN) { next_symbol();  true;}
 	else return false;
 }
 
@@ -573,8 +691,8 @@ static boolean UNARY_ADDING_OPERATOR(){
 
 static boolean BINARY_ADDING_OPERATOR(){
 	
-	if(current_symbol.code==PLUS_TOKEN) { return true;}
-	else if(current_symbol.code==SUBSTRACT_TOKEN) { return true;}
+	if(current_symbol.code==PLUS_TOKEN) { next_symbol(); return true;}
+	else if(current_symbol.code==SUBSTRACT_TOKEN) {next_symbol(); return true;}
 	// TODO FIND THE THE NAME OF TOKEN &   else if(current_symbol.code=="&") { return true;}
 	else return false;
 
@@ -586,10 +704,10 @@ static boolean BINARY_ADDING_OPERATOR(){
 
 static boolean MULTIPLYING_OPERATOR(){
 
-	if(current_symbol.code==MULTIPLY_TOKEN) {  return true;}
-	else if(current_symbol.code==DIVIDE_TOKEN) {  return true;}
-	else if(current_symbol.code==MOD_TOKEN) {  return true;}
-	else if(current_symbol.code==REM_TOKEN) {  return true;}
+	if(current_symbol.code==MULTIPLY_TOKEN) { next_symbol(); return true;}
+	else if(current_symbol.code==DIVIDE_TOKEN) { next_symbol(); return true;}
+	else if(current_symbol.code==MOD_TOKEN) { next_symbol(); return true;}
+	else if(current_symbol.code==REM_TOKEN) { next_symbol(); return true;}
 	else return false;
 	
 }
@@ -597,9 +715,9 @@ static boolean MULTIPLYING_OPERATOR(){
 /*
  * CONDITION ::= EXPRESSION
  */
-static boolean  CONDITION() {
-	
-	return EXPRESSION();
+static boolean CONDITION() {
+	if(EXPRESSION()) return true;
+	return false;
 
 }
 
@@ -610,13 +728,13 @@ static boolean  CONDITION() {
 
 static boolean  RELATION_OPERATOR(){
 
-	if(current_symbol.code==EQUAL_TOKEN) { return true;}
+	if(current_symbol.code==EQUAL_TOKEN) {next_symbol(); return true;}
 	// TODO FIND THE THE NAME OF TOKEN /=       else if(current_symbol.code=="/=") { return true;}
-	else if(current_symbol.code==LESS_TOKEN) { return true;}
-	else if(current_symbol.code==LESS_EQUAL_TOKEN) { return true;}
-	else if(current_symbol.code==GREATER_TOKEN) {  return true;}
-	else if(current_symbol.code==GREATER_EQUAL_TOKEN) {  return true;}
+	else if(current_symbol.code==LESS_TOKEN) { next_symbol(); return true;}
+	else if(current_symbol.code==LESS_EQUAL_TOKEN) { next_symbol(); return true;}
+	else if(current_symbol.code==GREATER_TOKEN) { next_symbol(); return true;}
+	else if(current_symbol.code==GREATER_EQUAL_TOKEN) { next_symbol(); return true;}
 	else return false;
 	
 }
-static boolean  _NAME(){return false;}
+

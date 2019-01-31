@@ -25,7 +25,7 @@ static char keywords[TOKEN_LIST_SIZE][20] = {
 	"constant",
 	"declare", 
 	"delay", 
-	"delta", 
+	"delta",
 	"digits", 
 	"do", 
 	"else", 
@@ -40,6 +40,7 @@ static char keywords[TOKEN_LIST_SIZE][20] = {
 	"goto", 
 	"if", 
 	"in", 
+	"inout",
 	"interface", 
 	"is", 
 	"limited", 
@@ -98,10 +99,11 @@ static char keywords[TOKEN_LIST_SIZE][20] = {
 	"(",
 	")",
 	";",
+	":"
 };
 
 
-static void read_word();
+ void read_word();
 static void read_number();
 static void read_special();
 static void read_separator();

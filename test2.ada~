@@ -1,6 +1,0 @@
-if a=b then
- a:= -3+4;
- b:= a or (5 mod d);
- c:=  a or (5 mod d)  ;
- d:= h xor m;
-end if ;
