@@ -26,7 +26,7 @@ typedef enum _pcode_inst {
 	BZE, 
 	HLT, /* End of the program */
 	NOP, /* No operation */
-	PRI
+	PRI,
 	PRC,
 } pcode_inst;
 

@@ -12,6 +12,7 @@ int main() {
 	file = fopen("test2.ada", "r");
 	PROGRAM();
 	fclose(file);
+	printf("sala \n");
 
 	return 0;
 }

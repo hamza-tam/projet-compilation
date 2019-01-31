@@ -83,6 +83,7 @@ static void assign_token(token t) {
 		int i;
 		for (i = 0; i < TOKEN_LIST_SIZE; i++) {
 			if (strcmp(current_symbol.word, keywords[i]) == 0) {
+printf("***************");
 				current_symbol.code = i;
 				printf("AFF %i : %s \n", i, current_symbol.word);
 				break;
@@ -146,7 +147,8 @@ static boolean is_special() {
 		case '<':		
 			return true; break;
 
-		default: return false; break;
+		default: 
+			return false; break;
 	}
 }
 
@@ -234,8 +236,10 @@ static boolean is_new_line() {
  * Checking if we have reached the end of the file
  */
 static boolean is_end_of_file() {
-	if (current_char == EOF) 
+	if (current_char == EOF) {
+	printf("yeeeeeees EOF");
 		return true;
+}
 
 	return false;
 }
@@ -271,7 +275,7 @@ static boolean is_point_char(){
 /*
  * Starting reading a word
  */
-static void read_word() {
+ void read_word() {
 
 	// Moving to the next character
 	next_char();
@@ -357,7 +361,6 @@ static void read_end_of_file() {
  */
 static void read_separator() {
 	next_char();
-
 	assign_token(SEPARATOR_TOKEN);
 }
 
