@@ -153,6 +153,8 @@ struct _stored_symbol {
 // Variable declaration
 FILE* file;
 char output_file_name[20];
+char interpreter_input_file_name[20];
+
 
 char current_char;
 struct _symbol current_symbol;

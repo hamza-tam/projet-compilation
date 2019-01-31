@@ -15,7 +15,7 @@ typedef enum _pcode_inst {
 	LSS, 
 	GEQ, 
 	LEQ, 
-	PRN, 
+	PRF, 
 	INN, 
 	INT, /* Asks for a number of memory spots to be reserved */
 	LDI, 
@@ -26,6 +26,8 @@ typedef enum _pcode_inst {
 	BZE, 
 	HLT, /* End of the program */
 	NOP, /* No operation */
+	PRI
+	PRC,
 } pcode_inst;
 
 
@@ -33,6 +35,7 @@ typedef enum _pcode_inst {
  * The structure that stores the a line of the pseudo code
  */
 typedef struct _pcode_line {
+	int line_number;
 	pcode_inst inst;
 	float parameter;
 } pcode_line;
@@ -41,9 +44,17 @@ typedef struct _pcode_line {
  * The struct to store the linked list of Pcode instructions
  */
 typedef struct _node {
+	struct _node *previous;
 	pcode_line line;
 	struct _node *next; 
 } node;
+
+
+
+int line_number;
+node *pcode;
+node *current_pcode;
+
 
 
 /**
@@ -60,8 +71,14 @@ void _pseudo_code_init();
  */
 void _pseudo_code_add_inst(pcode_inst inst, float param);
 
-/* Writing pseudo code into a file */
+/* Writing pseudo code into a file in binary format */
 void _pseudo_code_write();
+
+/* Writing pseudo code into a file in text format */
+void _pseudo_code_write_text();
+
+/* Reading pseudo code from file */
+void _pseudo_code_read_text();
 
 /* Printing the pseudo code */
 void _pseudo_code_print();

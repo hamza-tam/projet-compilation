@@ -6,12 +6,16 @@
 #include <stdlib.h>
 #include <string.h>
 
+#include "global.h"
 #include "pseudo_code.h"
 #include "pile.h"
 
-/* Current line of pseudo code */
-pcode_line *line;
 
+/* The instruction counter */
+node *current_node;
+
+void _interpret_pseudo_code();
+void _interpreter_get_current_node();
 
 
 #endif

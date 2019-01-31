@@ -28,13 +28,13 @@ clean:
 mrproper:
 	rm compilateur
 
-interpreteur: interpreteur.o pile.o
-	gcc -o interpreteur interpreteur.o pile.o
+interpreteur: interpreteur.o pile.o pseudo_code.o
+	gcc -o interpreteur interpreteur.o pile.o pseudo_code.o -g
 
 interpreteur.o: interpreteur.c interpreteur.h pile.h
-	gcc -o interpreteur.o -c interpreteur.c
+	gcc -o interpreteur.o -c interpreteur.c -g
 
 pile.o: pile.c pile.h
-	gcc -o pile.o -c pile.c
+	gcc -o pile.o -c pile.c -g
 
 
