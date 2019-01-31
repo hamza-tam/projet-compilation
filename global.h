@@ -139,7 +139,7 @@ struct _symbol {
 // Type of the symbols that will be stored in the tanle of symbols
 typedef enum _symbol_type {
 	TVAR,
-	TPROS,
+	TPROC,
 } symbol_type;
 
 
@@ -154,6 +154,7 @@ struct _stored_symbol {
 
 // Variable declaration
 FILE* file;
+char output_file_name[20];
 
 char current_char;
 struct _symbol current_symbol;
