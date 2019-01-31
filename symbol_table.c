@@ -59,6 +59,21 @@ int symbol_exists() {
 
 
 /*
+ * Check if a specific symbol already exists in the symbol table
+ * return the index of the symbol in the table if it exists
+ * or return -1 if the symbol does not exists in the table 
+ */
+int _specific_symbol_exists(char *symbol) {
+	for (int i = 0; i < symbol_table_size; i++) {
+		if ( strcmp(symbol_table[i].word, symbol) == 0 ) 
+			return i;
+	}
+
+	return -1;
+}
+
+
+/*
  * Printing into the screen the symbol table
  */
 void show_symbol_table() {

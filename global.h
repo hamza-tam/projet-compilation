@@ -10,6 +10,13 @@
 #define WORD_LENGTH 200+1
 #define TOKEN_LIST_SIZE 88
 
+
+/**
+ * Definition of states
+ */
+#define NON_VARIABLE_NAME 	0
+#define VARIABLE_NAME 		1
+
 // Declaring a boolean
 typedef enum _boolean {
 	false, true
@@ -167,6 +174,8 @@ struct _stored_symbol *symbol_table;
 
 int current_line;
 int offset;
+
+int state;
 
 
 #endif

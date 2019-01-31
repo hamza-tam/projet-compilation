@@ -36,10 +36,16 @@ boolean PROGRAM() {
 //SUBPROGRAM_BODY := SUBPROGRAM_SPECIFICATION is DECLARATIVE_PART begin HANDLED_STATEMENT_OF_SEQUENCE end  [DESIGNATOR];
 static boolean SUBPROGRAM_BODY(){
 	
+	/* The identifiers declared now are not variables */
+	state = NON_VARIABLE_NAME;
+
 	if(!SUBPROGRAM_SPECIFICATION()) return false;
 	
 	if (current_symbol.code != IS_TOKEN) raise_error(IS_EXPECTED_ERROR);
 	next_symbol();
+
+	/* The identifiers declared now can be variables */
+	state = VARIABLE_NAME;
 
 	if(!DECLARATIVE_PART())	raise_error(DECLARATIVE_PART_ERROR);
 
@@ -110,7 +116,6 @@ static boolean PARAMETER_PROFILE() {
 
 //FORMAT_PART := (PARAMETER_SPECIFICATION{;PARAMETER_SPECIFICATION})
 static boolean FORMAT_PART() {
-	printf("here\n");
 	if (current_symbol.code != OPEN_PARENTHESIS_TOKEN)  return false;
 	next_symbol();
 
@@ -134,13 +139,9 @@ static boolean FORMAT_PART() {
 static boolean PARAMETER_SPECIFICATION() {
 	printf("debug 1\n");
 	if(!DEFINING_IDENTIFIER_LIST()) return false;
-		printf("debug 2\n");
-	if (current_symbol.code != DEUXPOINTS_TOKEN) { printf("ereuueueueuuue\n");raise_error(DEUXPOINTS_EXPECTED_ERROR);}
-	printf("debug 3\n");
+	if (current_symbol.code != DEUXPOINTS_TOKEN) raise_error(DEUXPOINTS_EXPECTED_ERROR);
 	next_symbol();
-	printf("debug 4\n");
 	if(!MODE()) raise_error(MODE_ERROR);
-		printf("debug 5\n");
 	return true;
 }
 
@@ -460,8 +461,6 @@ static boolean SIMPLE_RETURN_STATEMENT() {
 	if (current_symbol.code != SEMICOLON_TOKEN) raise_error(SEMICOLON_EXPECTED_ERROR);
 	next_symbol();
 
-	printf("Finished reading return statement \n");	
-
 	return true;
 }
 
@@ -528,9 +527,7 @@ static boolean IF_STATEMENT(){
 	next_symbol();
 
 	
-	printf(" fin de if statement \n " );
 	return true;
-
 }
 
 /*
