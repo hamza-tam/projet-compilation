@@ -13,7 +13,7 @@ pseudo_code.o: pseudo_code.h pseudo_code.c global.h
 	gcc -o pseudo_code.o -c pseudo_code.c -g
 
 symbol_table.o: symbol_table.c symbol_table.h global.h
-	gcc -o symbol_table.o -c symbol_table.c -g	
+	gcc -std=c99  -o symbol_table.o -c symbol_table.c -g	
 
 analyseur_lexical.o: analyseur_lexical.c global.h errors.h 
 	gcc -o analyseur_lexical.o -c analyseur_lexical.c -g
@@ -32,9 +32,9 @@ interpreteur: interpreteur.o pile.o pseudo_code.o
 	gcc -o interpreteur interpreteur.o pile.o pseudo_code.o -g
 
 interpreteur.o: interpreteur.c interpreteur.h pile.h
-	gcc -o interpreteur.o -c interpreteur.c -g
+	gcc -std=c99 -o interpreteur.o -c interpreteur.c -g
 
 pile.o: pile.c pile.h
-	gcc -o pile.o -c pile.c -g
+	gcc -std=c99 -o pile.o -c pile.c -g
 
 

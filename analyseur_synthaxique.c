@@ -135,7 +135,7 @@ static boolean PARAMETER_SPECIFICATION() {
 	printf("debug 1\n");
 	if(!DEFINING_IDENTIFIER_LIST()) return false;
 		printf("debug 2\n");
-	if (current_symbol.code != DEUXPOINTS_TOKEN) raise_error(DEUXPOINTS_EXPECTED_ERROR);
+	if (current_symbol.code != DEUXPOINTS_TOKEN) { printf("ereuueueueuuue\n");raise_error(DEUXPOINTS_EXPECTED_ERROR);}
 	printf("debug 3\n");
 	next_symbol();
 	printf("debug 4\n");
@@ -261,26 +261,31 @@ static boolean OBJECT_DECLARATION () {
 	if (current_symbol.code != DEUXPOINTS_TOKEN) {
 		raise_error(DEUXPOINTS_EXPECTED_ERROR);
 	}
-	
+
 	if (current_symbol.code == CONSTANT_TOKEN) {
-		
+		next_symbol();
 	}
 	
 	if(!SUBTYPE_INDICATION()){
 		raise_error(SUBTYPE_INDICATION_ERROR);
 	}
+
+	next_symbol();
 	
 	if (current_symbol.code == AFFECTATION_TOKEN) {
 		if(!EXPRESSION()) raise_error(EXPRESSION_ERROR);
 	}
-	
+
+	if (current_symbol.code == SEMICOLON_TOKEN) {
+		next_symbol();
+	}
 		
 	return true;
 }
 
 // where we will define our types //int..
 static boolean SUBTYPE_INDICATION() {	
-	
+	next_symbol();
 	return true;
 }
 
