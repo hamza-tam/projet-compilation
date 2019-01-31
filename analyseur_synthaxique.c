@@ -365,7 +365,6 @@ static boolean LOOP_STATEMENT() {
 	/**
 	 * generate pseudo code
 	*/
-	int indice_brn = line_number;
 	
 	
 	if(!SEQUENCE_OF_STATEMENT()){
@@ -375,7 +374,7 @@ static boolean LOOP_STATEMENT() {
 	/**
 	 * generate pseudo code
 	*/
-	_pseudo_code_add_inst(BRN,indice_brn);
+	_pseudo_code_add_inst(ADD, 0);
 
 
 	if(current_symbol.code!=END_TOKEN) {
