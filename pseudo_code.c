@@ -61,7 +61,7 @@ void _pseudo_code_write() {
 }
 
 void _pseudo_code_write_text() {
-	node *n = pcode;
+	node *n = pcode->next;
 
 	/* Opening the file */
 	FILE *f = fopen(output_file_name, "w");
@@ -71,6 +71,7 @@ void _pseudo_code_write_text() {
 	while(n != NULL) {
 		current_line = &(n->line);
 		fprintf(f, "%i %i %f \n", current_line->line_number, current_line->inst, current_line->parameter);
+		n = n->next;
 	} 
 
 	fclose(f);

@@ -21,9 +21,11 @@ analyseur_lexical.o: analyseur_lexical.c global.h errors.h
 global.o: errors.c errors.h
 	gcc -o errors.o -c errors.c -g
 
-
 clean:
 	rm -rf *.o *.c~ *.h~ *.ada~
+
+bp: clean mrproper
+	rm -rf interpreteur 
 
 mrproper:
 	rm compilateur
