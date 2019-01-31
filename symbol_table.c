@@ -34,6 +34,8 @@ boolean add_symbol(symbol_type t) {
 		// adding the symbol to the table
 		strcpy(symbol_table[symbol_table_size].word, current_symbol.word);
 		symbol_table[symbol_table_size].type = t;
+		symbol_table[symbol_table_size].address = symbol_table_size;
+
 		
 		// Incrementing the symbol table size
 		symbol_table_size++;

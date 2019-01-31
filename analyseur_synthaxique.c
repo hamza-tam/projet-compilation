@@ -12,6 +12,7 @@ boolean PROGRAM() {
 	// Initialization
 	init_symbol();
 	init_symbol_table();
+	_pseudo_code_init();
 
 	// Reading the first token
 	next_symbol();
@@ -21,8 +22,11 @@ boolean PROGRAM() {
 	// Trying to find the grammar to execute
 	if (SUBPROGRAM_BODY()) result = true;
 
+	_pseudo_code_add_inst(HLT, 0);
+
 	// Showing the symbol table
 	show_symbol_table();
+	_pseudo_code_write_text();
 
 	return result;
 }
@@ -93,6 +97,14 @@ static boolean DPUN(){
 static boolean DEFINING_IDENTIFIER(){	
 	
 	if (current_symbol.code != ID_TOKEN)  return false;
+	
+	/**
+	 * Ajout dans la table des symboles
+	 */
+	// NOUHAS TAATZIDIHA
+	add_symbol(TVAR);
+	_pseudo_code_add_inst(INT, 1);
+
 	next_symbol();
 	
 	return true;	
@@ -361,20 +373,9 @@ static boolean LOOP_STATEMENT() {
  * ASSIGNEMENT_OR_PROCEDURE_CALL_STATEMENT ::= name ASSIGNEMENT_OR_PROCEDURE_CALL_END_STATEMENT
  */
 static boolean ASSIGNEMENT_OR_PROCEDURE_CALL_STATEMENT() {
-	//printf("ASSIGNEMENT_OR_PROCEDURE_CALL_STATEMENT\n");
-	//printf("\n\n\n%i : %s \n\n\n",current_symbol.code, current_symbol.word);
-/*
-if (current_symbol.code == END_TOKEN) {
-	//printf("-----------------------------***********-------------------------------------------end l3rss\n");
-	return false;
-	}
-*/
 	if (current_symbol.code != ID_TOKEN) return false;
-	//printf("-----------------------------***********-------------------------------------------befoore\n");
-	//add_symbol(TVAR);
+	_pseudo_code_add_inst(LDA, symbol_exists());
 	next_symbol();
-	//printf("-----------------------------***********-------------------------------------------after\n");
-	// reading the next grammar
 	if(!ASSIGNEMENT_OR_PROCEDURE_CALL_END_STATEMENT()) raise_error(ASSIGNEMENT_OR_PROCEDURE_CALL_END_STATEMENT_ERROR);
 
 	return true;
@@ -384,9 +385,9 @@ if (current_symbol.code == END_TOKEN) {
  * ASSIGNEMENT_OR_PROCEDURE_CALL_END_STATEMENT ::= ASSIGNEMENT_STATEMENT | PROCEDURE_CALL_STATEMENT
  */
 static boolean ASSIGNEMENT_OR_PROCEDURE_CALL_END_STATEMENT() {
-	if (ASSIGNEMENT_STATEMENT()) 
+	if (ASSIGNEMENT_STATEMENT()) {
 		return true;
-	else if (PROCEDURE_CALL_STATEMENT()) 
+	} else if (PROCEDURE_CALL_STATEMENT()) 
 		return true;
 	else 
 		return false;
@@ -405,6 +406,8 @@ static boolean ASSIGNEMENT_STATEMENT() {
 	// Reading an expression
 	if(!EXPRESSION()) 
 		raise_error(EXPRESSION_ERROR);
+	
+	_pseudo_code_add_inst(STO, 0);
 
 	if (current_symbol.code != SEMICOLON_TOKEN)
 		raise_error(SEMICOLON_EXPECTED_ERROR);
@@ -609,8 +612,17 @@ static boolean SIMPLE_EXPRESSION(){
 
 	if(!TERM()) return false;
 
+	token op;
+
+	op = current_symbol.code;
+	
 	while (BINARY_ADDING_OPERATOR()){
 		if(!TERM()) raise_error(TERM_ERROR);				
+		
+		if (op == PLUS_TOKEN)
+			_pseudo_code_add_inst(ADD, 0);
+
+		op = current_symbol.code;
 	}
 	
 	return true;
@@ -632,7 +644,6 @@ static boolean TERM(){
 
 /*
  * FACTOR ::= PRIMARY [** PRIMARY] 
- //**
  */
 
 static boolean FACTOR() {
@@ -656,7 +667,10 @@ static boolean FACTOR() {
 
 static boolean PRIMARY(){
 
-	if(current_symbol.code==INTEGER_TOKEN || current_symbol.code==REAL_NUMBER_TOKEN) { next_symbol(); return true;}
+	if(current_symbol.code==INTEGER_TOKEN || current_symbol.code==REAL_NUMBER_TOKEN) { 
+		_pseudo_code_add_inst(LDI, atoi(current_symbol.word));
+		next_symbol(); return true;
+	}
 	else if(current_symbol.code==NULL_TOKEN) { next_symbol(); return true;}
 	else if(current_symbol.code==ID_TOKEN) { next_symbol(); return true;}
 	else if(current_symbol.code==STRING_TOKEN) { next_symbol(); return true;}

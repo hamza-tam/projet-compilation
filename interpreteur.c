@@ -5,7 +5,7 @@ int pc = 1;
 
 int main(int argc, char** argv) {
 	/* Loading the file containing the Pcode */
-	strcpy(interpreter_input_file_name,"test.output");
+	strcpy(interpreter_input_file_name,"output");
 
 	_pseudo_code_init();
 	_pile_init();
