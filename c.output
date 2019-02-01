@@ -1,0 +1,70 @@
+aff 48 : procedure 
+AFF 97 :   
+AFF 91 : test 
+AFF 97 :   
+aff 33 : is 
+AFF 97 :   
+AFF 97 :  
+AFF 97 :   
+AFF 91 : v 
+AFF 97 :   
+aff 87 : : 
+AFF 97 :   
+AFF 91 : integer 
+aff 86 : ; 
+AFF 97 :  
+aff 10 : begin 
+AFF 97 :   
+AFF 97 :  
+AFF 97 : 	 
+AFF 91 : v 
+debut Statement
+simple Statement
+aff 79 : := 
+AFF 95 : 2 
+UNARY_ADDING_OPERATOR
+FACTOR
+PRIMARY
+aff 86 : ; 
+BINARY_ADDING_OPERATOR
+RELATION_OPERATOR
+AFF 97 :  
+AFF 97 : 	 
+aff 90 : Get 
+debut Statement
+simple Statement
+IO STATEMENT
+aff 84 : ( 
+AFF 91 : v 
+aff 85 : ) 
+aff 86 : ; 
+AFF 97 :  
+AFF 97 : 	 
+aff 89 : Put 
+debut Statement
+simple Statement
+IO STATEMENT
+aff 84 : ( 
+AFF 91 : v 
+UNARY_ADDING_OPERATOR
+FACTOR
+PRIMARY
+aff 85 : ) 
+BINARY_ADDING_OPERATOR
+RELATION_OPERATOR
+aff 86 : ; 
+AFF 97 :  
+aff 21 : end 
+debut Statement
+simple Statement
+IO STATEMENT
+FINISHED IO statement
+COMPOUND_STATEMENT
+AFF 97 :   
+aff 86 : ; 
+===============================
+Symbol table 
+===============================
+--> test 
+--> v 
+sala 

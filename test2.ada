@@ -1,7 +1,9 @@
-procedure test (p:in) is 
+procedure test is 
  v : integer;
 begin 
-	v:=2;
-	Get(v);
+	loop
+		Get(v);
+		exit when v = 1;
+	end loop;
 	Put(v);
 end ;

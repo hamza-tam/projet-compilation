@@ -83,7 +83,7 @@ static boolean PROCEDURE_SPECIFICATION(){
 
 	if(!DPUN()) raise_error(DPUN_ERROR); 
 		
-	if(!PARAMETER_PROFILE()) raise_error(PARAMETER_PROFILE_ERROR);
+	PARAMETER_PROFILE();
 		
 	return true;	
 } 
@@ -472,7 +472,6 @@ static boolean EXIT_STATEMENT() {
  * WRITE_STATEMENT ::= Put(EXPRESSION);
  */
 static boolean WRITE_STATEMENT() {
-	printf("WRITE_STATEMENT -----------------------------\n");
 	if (current_symbol.code != PUT_TOKEN) return false;
 	next_symbol();
 
@@ -489,8 +488,6 @@ static boolean WRITE_STATEMENT() {
 
 	_pseudo_code_add_inst(PRF, 0);
 
-	printf("FINISHED WRITE_STATEMENT ------------------------\n");
-
 	return true;
 }
 
@@ -498,7 +495,6 @@ static boolean WRITE_STATEMENT() {
  * READ_STATEMENT ::= Get(EXPRESSION);
  */
 static boolean READ_STATEMENT() {
-	printf("READING STATEMENT \n");
 	if (current_symbol.code != GET_TOKEN) return false;
 	next_symbol();
 
@@ -516,8 +512,6 @@ static boolean READ_STATEMENT() {
 
 	if (current_symbol.code != SEMICOLON_TOKEN) raise_error(SEMICOLON_EXPECTED_ERROR);
 	next_symbol();
-
-	printf("FINISHED READING STATEMET\n");
 
 	return true;
 }
