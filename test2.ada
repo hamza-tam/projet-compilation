@@ -3,8 +3,10 @@ procedure test (p:in) is
 begin 
 	v:=2;
 
-	if v=2 then v:= 4;
-	v=7;
+	if v=3 then 
+
+	v:=4;	
+	v:=7;
 
 	end if;
 end ;
