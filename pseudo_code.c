@@ -119,7 +119,6 @@ void _pseudo_code_fix_bze() {
 	/* looking for a BZE with a missing argument */
 	while (n != NULL && !fixed) {
 		if (n->line.inst == BZE && n->line.parameter == -1) {
-			printf("msgipojjojoiioko;m:l;l;kml;,mkl;lknkhbjgkv\n");
 			fixed = true;
 			n->line.parameter = line_number;
 		}
@@ -128,20 +127,33 @@ void _pseudo_code_fix_bze() {
 	}	
 }
 
-void _pseudo_code_fix_bze_skip(int step) {
+void _pseudo_code_fix_brn() {
 	boolean fixed = false;
 
 	node *n = current_pcode;
-	int count = step;
 
 	/* looking for a BZE with a missing argument */
 	while (n != NULL && !fixed) {
-		if (n->line.inst == BZE && n->line.parameter == -1) {
-			if (step > 0) step--;
-			else {
-				fixed = true;
-				n->line.parameter = line_number + 1;	
-			}
+		if (n->line.inst == BRN && n->line.parameter == -1) {
+			fixed = true;
+			n->line.parameter = line_number;
+		}
+		/* Going to the previous instruction */
+		n = n->previous;
+	}	
+}
+
+
+void _pseudo_code_fix_nbz() {
+	boolean fixed = false;
+
+	node *n = current_pcode;
+
+	/* looking for a BZE with a missing argument */
+	while (n != NULL && !fixed) {
+		if (n->line.inst == NBZ && n->line.parameter == -1) {
+			fixed = true;
+			n->line.parameter = line_number;
 		}
 		/* Going to the previous instruction */
 		n = n->previous;

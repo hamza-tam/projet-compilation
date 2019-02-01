@@ -29,6 +29,7 @@ typedef enum _pcode_inst {
 	PRI,
 	PRC,
 	NEG, /* Change the number to its negative */
+	NBZ, /* Branch if not equal (the contrary of the BZE) */
 } pcode_inst;
 
 
@@ -87,7 +88,10 @@ void _pseudo_code_print();
 /* Adding the parameter to the BZE instruction */
 void _pseudo_code_fix_bze();
 
+/* Adding the parameter to the NBZ instruction */
+void _pseudo_code_fix_nbz();
+
 /* Adding the parameter to the BZE instruction with skip */
-void _pseudo_code_fix_bze_skip(int step);
+void _pseudo_code_fix_brn();
 
 #endif

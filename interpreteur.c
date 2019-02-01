@@ -198,6 +198,11 @@ void _interpret_pseudo_code() {
 			pc++;
 			break;
 
+		case NBZ:
+			if (_pile_top() != 0) pc = (int) current_node->line.parameter;
+			else pc++;
+			break;
+
 		default:
 			end = true;
 			break;

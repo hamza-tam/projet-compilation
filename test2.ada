@@ -1,7 +1,8 @@
 procedure test (p:in) is 
  v : integer;
 begin 
-	v:=2;
-	if v=2 then v:= 4;
+	v:=3;
+	if v=3 then v:= 4;
+	else v:= 5;
 	end if;
 end ;
