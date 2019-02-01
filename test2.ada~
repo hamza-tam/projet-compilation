@@ -4,7 +4,7 @@ c: integer;
 begin 
 
 	v:=1;
-	c:=2;
+	c:=1;
 	loop
 	c:=c+1;
 	exit when c=4;

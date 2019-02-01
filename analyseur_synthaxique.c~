@@ -390,7 +390,7 @@ static boolean LOOP_STATEMENT() {
 	 * generate pseudo code
 	*/
 	_pseudo_code_add_inst(BRN,indice_brn);
-	_pseudo_code_fix_nbz();
+
 
 	if(current_symbol.code!=END_TOKEN) {
 
@@ -407,7 +407,7 @@ static boolean LOOP_STATEMENT() {
 	if(current_symbol.code!=SEMICOLON_TOKEN) {
 		raise_error(SEMICOLON_EXPECTED_ERROR);
 	}
-
+	_pseudo_code_fix_nbz();
 	next_symbol();
 		
 	return true;
