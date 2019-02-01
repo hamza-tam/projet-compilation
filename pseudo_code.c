@@ -126,3 +126,23 @@ void _pseudo_code_fix_bze() {
 		n = n->previous;
 	}	
 }
+
+void _pseudo_code_fix_bze_skip(int step) {
+	boolean fixed = false;
+
+	node *n = current_pcode;
+	int count = step;
+
+	/* looking for a BZE with a missing argument */
+	while (n != NULL && !fixed) {
+		if (n->line.inst == BZE && n->line.parameter == -1) {
+			if (step > 0) step--;
+			else {
+				fixed = true;
+				n->line.parameter = line_number + 1;	
+			}
+		}
+		/* Going to the previous instruction */
+		n = n->previous;
+	}	
+}

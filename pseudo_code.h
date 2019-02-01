@@ -87,4 +87,7 @@ void _pseudo_code_print();
 /* Adding the parameter to the BZE instruction */
 void _pseudo_code_fix_bze();
 
+/* Adding the parameter to the BZE instruction with skip */
+void _pseudo_code_fix_bze_skip(int step);
+
 #endif
