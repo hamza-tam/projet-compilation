@@ -12,7 +12,7 @@ int main(int argc, char** argv) {
 
 	_pseudo_code_read_text();
 
-	_pseudo_code_print();
+	_pseudo_code_print_text();
 
 	_interpret_pseudo_code();
 
@@ -142,7 +142,7 @@ void _interpret_pseudo_code() {
 			pc++;
 			break;
 
-		case INN:
+		case RDF:
 			scanf("%f", &hold);
 			_pile_add(hold);
 			pc++;

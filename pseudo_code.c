@@ -110,6 +110,21 @@ void _pseudo_code_print() {
 	printf("\nEND OF PSEUDO CODE\n");
 }
 
+void _pseudo_code_print_text() {
+	/* Creating the node to cycle throw nodes */
+	node *n = pcode;
+
+	printf("\n================================\n\tPSEUDO CODE\n\n");
+
+	/* Cycle throw the nodes */
+	while(n != NULL) {
+		printf("Inst code : %2.d -- %s - %f \n", n->line.line_number, inst_table[n->line.inst], n->line.parameter);
+		n = n->next;
+	}
+
+	printf("\nEND OF PSEUDO CODE\n");
+}
+
 
 void _pseudo_code_fix_bze() {
 	boolean fixed = false;

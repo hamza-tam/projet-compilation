@@ -8,7 +8,7 @@
 
 
 #define WORD_LENGTH 200+1
-#define TOKEN_LIST_SIZE 88
+#define TOKEN_LIST_SIZE 91
 
 
 /**
@@ -121,7 +121,12 @@ typedef enum _token_list {
 	CLOSE_PARENTHESIS_TOKEN,//85
 	SEMICOLON_TOKEN,
 	DEUXPOINTS_TOKEN,
+	DIFF_TOKEN,
 
+	// Added keywords tokens
+	PUT_TOKEN,
+	GET_TOKEN,
+	
 
 	// Special tokens
 	ID_TOKEN,
