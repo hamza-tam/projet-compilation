@@ -1,10 +1,12 @@
 procedure test (p:in) is 
  v : integer;
- a : integer;
+c: integer;
 begin 
-	v:= w;
+
+	c:=0;
 	loop
-b:=9+5;
+	v:=9+5;
+	exit when c=4;
 	end loop ;
 	
 

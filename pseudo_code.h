@@ -84,4 +84,7 @@ void _pseudo_code_read_text();
 /* Printing the pseudo code */
 void _pseudo_code_print();
 
+/* Adding the parameter to the BZE instruction */
+void _pseudo_code_fix_bze();
+
 #endif
