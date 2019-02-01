@@ -504,7 +504,7 @@ static boolean EXIT_STATEMENT() {
  static boolean IO_STATEMENT() {
  	printf("IO STATEMENT\n");
  	if (WRITE_STATEMENT()) return true;
- 	if (READ_STATEMENT()) return true;
+ 	else if (READ_STATEMENT()) return true;
 
  	printf("FINISHED IO statement\n");
 
@@ -515,6 +515,7 @@ static boolean EXIT_STATEMENT() {
  * WRITE_STATEMENT ::= Put(EXPRESSION);
  */
 static boolean WRITE_STATEMENT() {
+	printf("WRITE_STATEMENT -----------------------------\n");
 	if (current_symbol.code != PUT_TOKEN) return false;
 	next_symbol();
 
@@ -530,6 +531,8 @@ static boolean WRITE_STATEMENT() {
 	next_symbol();
 
 	_pseudo_code_add_inst(PRF, 0);
+
+	printf("FINISHED WRITE_STATEMENT ------------------------\n");
 
 	return true;
 }
