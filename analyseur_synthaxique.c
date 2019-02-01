@@ -567,6 +567,7 @@ _pseudo_code_add_inst(BZE, -1);
 
 	_pseudo_code_fix_brn();	
 
+
 	if(current_symbol.code!=END_TOKEN) 
 		raise_error(END_EXPECTED_ERROR);
 	next_symbol();
@@ -648,9 +649,14 @@ static boolean RELATION(){
 		if(!SIMPLE_EXPRESSION()) {
 			raise_error(SIMPLE_EXPRESSION_ERROR);
 		}
-		if (op == EQUAL_TOKEN) _pseudo_code_add_inst(EQL, 0);//Mery
 
-		
+		if (op == EQUAL_TOKEN) _pseudo_code_add_inst(EQL, 0);//Mery		
+		//if (op == LESS_TOKEN) _pseudo_code_add_inst(LSS, 0);//Mery
+		//if (op == LESS_EQUAL_TOKEN) _pseudo_code_add_inst(LEQ, 0);//Mery				
+		//if (op == GREATER_TOKEN) _pseudo_code_add_inst(GT, 0);//Mery
+		//if (op == GREATER_EQUAL_TOKEN) _pseudo_code_add_inst(GEQ, 0);//Mery		
+		//if (op == DIFF_TOKEN) _pseudo_code_add_inst(NEQ, 0);//Mery
+
 				
 	}
 
@@ -819,10 +825,9 @@ static boolean CONDITION() {
  */
 
 static boolean  RELATION_OPERATOR(){
-				printf("CONDITION\n");
-	if(current_symbol.code==EQUAL_TOKEN) {
-		next_symbol(); return true;}
-	// TODO FIND THE THE NAME OF TOKEN /=       else if(current_symbol.code=="/=") { return true;}
+				printf("RELATION_OPERATOR\n");
+	if(current_symbol.code==EQUAL_TOKEN) { next_symbol(); return true;}
+        else if(current_symbol.code==DIFF_TOKEN) { next_symbol(); return true;}
 	else if(current_symbol.code==LESS_TOKEN) { next_symbol(); return true;}
 	else if(current_symbol.code==LESS_EQUAL_TOKEN) { next_symbol(); return true;}
 	else if(current_symbol.code==GREATER_TOKEN) { next_symbol(); return true;}
