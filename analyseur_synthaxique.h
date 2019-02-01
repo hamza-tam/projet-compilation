@@ -37,6 +37,10 @@ static boolean OBJECT_DECLARATION ();
 static boolean SUBTYPE_INDICATION();
 
 
+static boolean IO_STATEMENT();
+static boolean WRITE_STATEMENT();
+static boolean READ_STATEMENT();
+
 
 static boolean HANDLED_STATEMENT_OF_SEQUENCE();
 static boolean SEQUENCE_OF_STATEMENT();

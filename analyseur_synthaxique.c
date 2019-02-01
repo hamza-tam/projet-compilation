@@ -342,13 +342,14 @@ static boolean STATEMENT() {
 
 
 /**
- * SIMPLE_STATEMENT ::= ASSIGNEMENT_STATEMENT | PROCEDURE_CALL_STATEMENT | EXIT_STATEMENT | SIMPLE_RETURN_STATEMENT
+ * SIMPLE_STATEMENT ::= ASSIGNEMENT_STATEMENT | PROCEDURE_CALL_STATEMENT | EXIT_STATEMENT | SIMPLE_RETURN_STATEMENT | IO_STATEMENT
  */
 static boolean SIMPLE_STATEMENT() {
 	printf("simple Statement\n");
 	if (ASSIGNEMENT_OR_PROCEDURE_CALL_STATEMENT()) return true;
 	else if (SIMPLE_RETURN_STATEMENT()) return true;
 	else if (PROCEDURE_CALL_STATEMENT()) return true;
+	else if (IO_STATEMENT()) return true;
 	else if (EXIT_STATEMENT()) return true;
 	else return false;
 }
@@ -497,6 +498,70 @@ static boolean EXIT_STATEMENT() {
 }
 
 
+/**
+ * IO_STATEMENT ::= WRITE_STATEMENT | READ_STATEMENT
+ */
+ static boolean IO_STATEMENT() {
+ 	printf("IO STATEMENT\n");
+ 	if (WRITE_STATEMENT()) return true;
+ 	if (READ_STATEMENT()) return true;
+
+ 	printf("FINISHED IO statement\n");
+
+ 	return false;
+ }
+
+/**
+ * WRITE_STATEMENT ::= Put(EXPRESSION);
+ */
+static boolean WRITE_STATEMENT() {
+	if (current_symbol.code != PUT_TOKEN) return false;
+	next_symbol();
+
+	if (current_symbol.code != OPEN_PARENTHESIS_TOKEN) raise_error(PO_EXPECTED_ERROR);
+	next_symbol();
+
+	if (!EXPRESSION()) raise_error(SIMPLE_EXPRESSION_ERROR);  
+
+	if (current_symbol.code != CLOSE_PARENTHESIS_TOKEN) raise_error(PF_EXPECTED_ERROR);
+	next_symbol();
+
+	if (current_symbol.code != SEMICOLON_TOKEN) raise_error(SEMICOLON_EXPECTED_ERROR);
+	next_symbol();
+
+	_pseudo_code_add_inst(PRF, 0);
+
+	return true;
+}
+
+/**
+ * READ_STATEMENT ::= Get(EXPRESSION);
+ */
+static boolean READ_STATEMENT() {
+	printf("READING STATEMENT \n");
+	if (current_symbol.code != GET_TOKEN) return false;
+	next_symbol();
+
+	if (current_symbol.code != OPEN_PARENTHESIS_TOKEN) raise_error(PO_EXPECTED_ERROR);
+	next_symbol();
+
+	if (current_symbol.code != ID_TOKEN) raise_error(IDENTIFIER_EXPECTED_ERROR);
+	_pseudo_code_add_inst(LDA, get_address());
+	_pseudo_code_add_inst(RDF, 0);
+	_pseudo_code_add_inst(STO, 0);
+	next_symbol();
+
+	if (current_symbol.code != CLOSE_PARENTHESIS_TOKEN) raise_error(PF_EXPECTED_ERROR);
+	next_symbol();
+
+	if (current_symbol.code != SEMICOLON_TOKEN) raise_error(SEMICOLON_EXPECTED_ERROR);
+	next_symbol();
+
+	printf("FINISHED READING STATEMET\n");
+
+	return true;
+}
+
 /*
  * SIMPLE_RETURN_STATEMENT ::= return [EXPRESSION] ;
  */
@@ -524,6 +589,8 @@ static boolean IF_STATEMENT(){
 	if(!CONDITION()){
 		raise_error(CONDITION_ERROR);
 	}
+	
+	_pseudo_code_add_inst(BZE, -1);
 
 _pseudo_code_add_inst(BZE, -1);
 
@@ -536,9 +603,7 @@ _pseudo_code_add_inst(BZE, -1);
 			raise_error(SEQUENCE_STATEMENT_ERROR);
 	}
 
-	_pseudo_code_add_inst(BRN, -1);
 
-	_pseudo_code_fix_bze();//Mery	
 	
 	// {else if CONDITION then SEQUENCE_OF_STATEMENT}
 	while(current_symbol.code==ELSIF_TOKEN){
@@ -565,7 +630,7 @@ _pseudo_code_add_inst(BZE, -1);
 		}
 	}
 
-	_pseudo_code_fix_brn();	
+	//	_pseudo_code_fix_brn();	
 
 
 	if(current_symbol.code!=END_TOKEN) 
@@ -578,6 +643,7 @@ _pseudo_code_add_inst(BZE, -1);
 
 	if(current_symbol.code!=SEMICOLON_TOKEN) 
 		raise_error(SEMICOLON_EXPECTED_ERROR);
+	_pseudo_code_fix_bze();//Mery	
 	next_symbol();
 		
 	return true;
@@ -588,7 +654,6 @@ _pseudo_code_add_inst(BZE, -1);
  */
 
 static boolean EXPRESSION(){
-		printf("EXPRESSION\n");
 	if(!RELATION()) return false;	
 	
 	// { and RELATION }
@@ -637,7 +702,6 @@ static boolean EXPRESSION(){
  */
 
 static boolean RELATION(){
-		printf("RELATION\n");
 	if(!SIMPLE_EXPRESSION()) return false;
 		
 
@@ -696,7 +760,6 @@ static boolean SIMPLE_EXPRESSION(){
  */
 
 static boolean TERM(){
-			printf("TERM\n");
 	if(!FACTOR()) return false;
 	
 	token op = current_symbol.code;
