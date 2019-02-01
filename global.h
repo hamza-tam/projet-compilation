@@ -134,6 +134,8 @@ typedef enum _token_list {
 	// SEPARATOR TOKEN
 	SEPARATOR_TOKEN,
 	EOF_TOKEN,//95
+
+	DIFF_TOKEN
 } token;
 
 
