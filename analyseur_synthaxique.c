@@ -356,7 +356,7 @@ static boolean SIMPLE_STATEMENT() {
 
 // COMPOUND_STATEMENT ::= IF_STATEMENT | CASE_STATEMENT | LOOP_STATEMENT
 static boolean COMPOUND_STATEMENT() {
-	//printf("COMPOUND_STATEMENT\n");
+	printf("COMPOUND_STATEMENT\n");
 	if(IF_STATEMENT()) return true;
 	else if(CASE_STATEMENT()) return true;
 	else if(LOOP_STATEMENT()) return true;
@@ -475,13 +475,15 @@ static boolean SIMPLE_RETURN_STATEMENT() {
  */
  
 static boolean IF_STATEMENT(){
-
+	printf("IF_STATEMENT\n");
 	if(current_symbol.code!=IF_TOKEN) return false;
 	next_symbol();
 
 	if(!CONDITION()){
 		raise_error(CONDITION_ERROR);
 	}
+
+	_pseudo_code_add_inst(BZE, -1);//Mery
 
 	if(current_symbol.code!=THEN_TOKEN) 
 		raise_error(THEN_EXPECTED_ERROR);
@@ -510,6 +512,7 @@ static boolean IF_STATEMENT(){
 		}
 
 	}
+		_pseudo_code_fix_bze();//Mery
 
 	if(current_symbol.code == ELSE_TOKEN) {
 		next_symbol();
@@ -530,6 +533,9 @@ static boolean IF_STATEMENT(){
 	if(current_symbol.code!=SEMICOLON_TOKEN) 
 		raise_error(SEMICOLON_EXPECTED_ERROR);
 	next_symbol();
+	
+	
+
 
 	
 	return true;
@@ -540,7 +546,7 @@ static boolean IF_STATEMENT(){
  */
 
 static boolean EXPRESSION(){
-	
+		printf("EXPRESSION\n");
 	if(!RELATION()) return false;	
 	
 	// { and RELATION }
@@ -589,13 +595,20 @@ static boolean EXPRESSION(){
  */
 
 static boolean RELATION(){
-
+		printf("RELATION\n");
 	if(!SIMPLE_EXPRESSION()) return false;
 		
+
+	token op;//Mery
+	op = current_symbol.code;
+
 	if (RELATION_OPERATOR()){
+
 		if(!SIMPLE_EXPRESSION()) {
-					raise_error(SIMPLE_EXPRESSION_ERROR);
-		}		
+			raise_error(SIMPLE_EXPRESSION_ERROR);
+		}
+		if (op == EQUAL_TOKEN) _pseudo_code_add_inst(EQL, 0);//Mery
+				
 	}
 
 	return true;
@@ -606,7 +619,6 @@ static boolean RELATION(){
  */
 
 static boolean SIMPLE_EXPRESSION(){
-	
 	token sig = current_symbol.code;
 	boolean add_sig = UNARY_ADDING_OPERATOR();
 
@@ -635,6 +647,7 @@ static boolean SIMPLE_EXPRESSION(){
  */
 
 static boolean TERM(){
+			printf("TERM\n");
 	if(!FACTOR()) return false;
 	
 	token op = current_symbol.code;
@@ -656,6 +669,7 @@ static boolean TERM(){
  */
 
 static boolean FACTOR() {
+			printf("FACTOR\n");
 	if(!PRIMARY()) return false;
 		
 	//TODO  [** PRIMARY] 
@@ -675,7 +689,7 @@ static boolean FACTOR() {
  */
 
 static boolean PRIMARY(){
-
+			printf("PRIMARY\n");
 	if(current_symbol.code==INTEGER_TOKEN || current_symbol.code==REAL_NUMBER_TOKEN) { 
 		/* The case where we are using numbers */
 		_pseudo_code_add_inst(LDI, atoi(current_symbol.word));
@@ -713,7 +727,7 @@ static boolean PRIMARY(){
  */
 
 static boolean UNARY_ADDING_OPERATOR(){
-
+			printf("UNARY_ADDING_OPERATOR\n");
 	if(current_symbol.code==PLUS_TOKEN) { next_symbol();  true;}
 	else if(current_symbol.code==SUBSTRACT_TOKEN) { next_symbol();  true;}
 	else return false;
@@ -724,7 +738,7 @@ static boolean UNARY_ADDING_OPERATOR(){
  */
 
 static boolean BINARY_ADDING_OPERATOR(){
-	
+				printf("BINARY_ADDING_OPERATOR\n");
 	if(current_symbol.code==PLUS_TOKEN) { next_symbol(); return true;}
 	else if(current_symbol.code==SUBSTRACT_TOKEN) {next_symbol(); return true;}
 	// TODO FIND THE THE NAME OF TOKEN &   else if(current_symbol.code=="&") { return true;}
@@ -750,6 +764,7 @@ static boolean MULTIPLYING_OPERATOR(){
  * CONDITION ::= EXPRESSION
  */
 static boolean CONDITION() {
+				printf("CONDITION\n");
 	if(EXPRESSION()) return true;
 	return false;
 
@@ -761,8 +776,9 @@ static boolean CONDITION() {
  */
 
 static boolean  RELATION_OPERATOR(){
-
-	if(current_symbol.code==EQUAL_TOKEN) {next_symbol(); return true;}
+				printf("CONDITION\n");
+	if(current_symbol.code==EQUAL_TOKEN) {
+		next_symbol(); return true;}
 	// TODO FIND THE THE NAME OF TOKEN /=       else if(current_symbol.code=="/=") { return true;}
 	else if(current_symbol.code==LESS_TOKEN) { next_symbol(); return true;}
 	else if(current_symbol.code==LESS_EQUAL_TOKEN) { next_symbol(); return true;}

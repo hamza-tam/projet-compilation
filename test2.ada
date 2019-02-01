@@ -1,7 +1,7 @@
 procedure test (p:in) is 
  v : integer;
- a : integer;
 begin 
-	a:= 3;
-	v:= 2 - 1;
-end;
+	v:=2;
+	if v=2 then v:= 4;
+	end if;
+end ;
