@@ -475,15 +475,12 @@ static boolean SIMPLE_RETURN_STATEMENT() {
  */
  
 static boolean IF_STATEMENT(){
-	printf("IF_STATEMENT\n");
 	if(current_symbol.code!=IF_TOKEN) return false;
 	next_symbol();
 
 	if(!CONDITION()){
 		raise_error(CONDITION_ERROR);
 	}
-
-	_pseudo_code_add_inst(BZE, -1);//Mery
 
 	if(current_symbol.code!=THEN_TOKEN) 
 		raise_error(THEN_EXPECTED_ERROR);
@@ -493,7 +490,10 @@ static boolean IF_STATEMENT(){
 	if(!SEQUENCE_OF_STATEMENT()){
 			raise_error(SEQUENCE_STATEMENT_ERROR);
 	}
-	
+
+	_pseudo_code_add_inst(BRN, -1);
+
+	_pseudo_code_fix_bze();//Mery	
 	
 	// {else if CONDITION then SEQUENCE_OF_STATEMENT}
 	while(current_symbol.code==ELSIF_TOKEN){
@@ -512,7 +512,6 @@ static boolean IF_STATEMENT(){
 		}
 
 	}
-		_pseudo_code_fix_bze();//Mery
 
 	if(current_symbol.code == ELSE_TOKEN) {
 		next_symbol();
@@ -520,6 +519,8 @@ static boolean IF_STATEMENT(){
 			raise_error(SEQUENCE_STATEMENT_ERROR);
 		}
 	}
+
+	_pseudo_code_fix_brn();	
 
 
 	if(current_symbol.code!=END_TOKEN) 
@@ -533,11 +534,7 @@ static boolean IF_STATEMENT(){
 	if(current_symbol.code!=SEMICOLON_TOKEN) 
 		raise_error(SEMICOLON_EXPECTED_ERROR);
 	next_symbol();
-	
-	
-
-
-	
+		
 	return true;
 }
 
@@ -607,12 +604,14 @@ static boolean RELATION(){
 		if(!SIMPLE_EXPRESSION()) {
 			raise_error(SIMPLE_EXPRESSION_ERROR);
 		}
+
 		//if (op == EQUAL_TOKEN) _pseudo_code_add_inst(EQL, 0);//Mery		
 		//if (op == LESS_TOKEN) _pseudo_code_add_inst(LSS, 0);//Mery
 		//if (op == LESS_EQUAL_TOKEN) _pseudo_code_add_inst(LEQ, 0);//Mery				
 		//if (op == GREATER_TOKEN) _pseudo_code_add_inst(GT, 0);//Mery
 		//if (op == GREATER_EQUAL_TOKEN) _pseudo_code_add_inst(GEQ, 0);//Mery		
 		//if (op == DIFF_TOKEN) _pseudo_code_add_inst(NEQ, 0);//Mery
+
 				
 	}
 
