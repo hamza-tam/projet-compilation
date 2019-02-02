@@ -368,8 +368,50 @@ static boolean CASE_STATEMENT() {
 	return false;
 }
 
+
+/**
+
+loop_statement ::= loop sequence_of_statements end loop ;
+*/
 static boolean LOOP_STATEMENT() {
-	return false;
+	if(current_symbol.code!=LOOP_TOKEN) return false;	
+	next_symbol();
+	
+
+	/**
+	 * generate pseudo code
+	*/
+	
+	int indice_brn = line_number;
+	if(!SEQUENCE_OF_STATEMENT()){
+		raise_error(SEQUENCE_STATEMENT_ERROR);
+	}
+
+	/**
+	 * generate pseudo code
+	*/
+	_pseudo_code_add_inst(BRN,indice_brn);
+	_pseudo_code_fix_nbz();
+
+	if(current_symbol.code!=END_TOKEN) {
+
+		raise_error(END_EXPECTED_ERROR);
+	}
+
+	next_symbol();
+
+	if(current_symbol.code!=LOOP_TOKEN) {
+			raise_error(LOOP_EXPECTED_ERROR);
+	}
+		next_symbol();
+
+	if(current_symbol.code!=SEMICOLON_TOKEN) {
+		raise_error(SEMICOLON_EXPECTED_ERROR);
+	}
+
+	next_symbol();
+		
+	return true;
 }
 
 
@@ -449,6 +491,7 @@ static boolean EXIT_STATEMENT() {
 	if (current_symbol.code == WHEN_TOKEN) {
 		next_symbol();
 		if(!CONDITION()) raise_error(CONDITION_ERROR);
+		_pseudo_code_add_inst(NBZ,-1);
 	}
 
 	return true;
@@ -461,7 +504,7 @@ static boolean EXIT_STATEMENT() {
  static boolean IO_STATEMENT() {
  	printf("IO STATEMENT\n");
  	if (WRITE_STATEMENT()) return true;
- 	if (READ_STATEMENT()) return true;
+ 	else if (READ_STATEMENT()) return true;
 
  	printf("FINISHED IO statement\n");
 
@@ -472,6 +515,7 @@ static boolean EXIT_STATEMENT() {
  * WRITE_STATEMENT ::= Put(EXPRESSION);
  */
 static boolean WRITE_STATEMENT() {
+	printf("WRITE_STATEMENT -----------------------------\n");
 	if (current_symbol.code != PUT_TOKEN) return false;
 	next_symbol();
 
@@ -487,6 +531,8 @@ static boolean WRITE_STATEMENT() {
 	next_symbol();
 
 	_pseudo_code_add_inst(PRF, 0);
+
+	printf("FINISHED WRITE_STATEMENT ------------------------\n");
 
 	return true;
 }
@@ -540,6 +586,7 @@ static boolean SIMPLE_RETURN_STATEMENT() {
  */
  
 static boolean IF_STATEMENT(){
+//int indice_brn;
 	if(current_symbol.code!=IF_TOKEN) return false;
 	next_symbol();
 
@@ -549,25 +596,29 @@ static boolean IF_STATEMENT(){
 	
 	_pseudo_code_add_inst(BZE, -1);
 
-	if(current_symbol.code!=THEN_TOKEN) 
-		raise_error(THEN_EXPECTED_ERROR);
+
+	if(current_symbol.code!=THEN_TOKEN) raise_error(THEN_EXPECTED_ERROR);
 
 	next_symbol();
 
 	if(!SEQUENCE_OF_STATEMENT()){
-			raise_error(SEQUENCE_STATEMENT_ERROR);
+		raise_error(SEQUENCE_STATEMENT_ERROR);
 	}
-
-
 	
+	_pseudo_code_add_inst(BRN,-1);
+	_pseudo_code_fix_bze();//Mery
+
 	// {else if CONDITION then SEQUENCE_OF_STATEMENT}
 	while(current_symbol.code==ELSIF_TOKEN){
+		
+		//indice_brn = line_number;
 		next_symbol();
 		
 		if(!CONDITION()){
 			raise_error(CONDITION_ERROR);
 		}
-			
+		_pseudo_code_add_inst(BZE, -1);
+	
 		if(current_symbol.code!=THEN_TOKEN) 
 			raise_error(THEN_EXPECTED_ERROR);		
 		next_symbol();
@@ -576,16 +627,19 @@ static boolean IF_STATEMENT(){
 			raise_error(SEQUENCE_STATEMENT_ERROR);
 		}
 
+		_pseudo_code_add_inst(BRN,-1);
+		_pseudo_code_fix_bze();//Mery
 	}
+
+
 
 	if(current_symbol.code == ELSE_TOKEN) {
 		next_symbol();
 		if(!SEQUENCE_OF_STATEMENT()){
 			raise_error(SEQUENCE_STATEMENT_ERROR);
 		}
-	}
 
-	//	_pseudo_code_fix_brn();	
+	}
 
 
 	if(current_symbol.code!=END_TOKEN) 
@@ -598,7 +652,14 @@ static boolean IF_STATEMENT(){
 
 	if(current_symbol.code!=SEMICOLON_TOKEN) 
 		raise_error(SEMICOLON_EXPECTED_ERROR);
-	_pseudo_code_fix_bze();//Mery	
+
+	//Mery
+	
+		_pseudo_code_fix_brn();	
+		_pseudo_code_fix_brn();	
+
+	//indice_brn = line_number;
+	
 	next_symbol();
 		
 	return true;

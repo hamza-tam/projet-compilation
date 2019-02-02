@@ -125,7 +125,7 @@ typedef enum _token_list {
 
 	// Added keywords tokens
 	PUT_TOKEN,
-	GET_TOKEN,
+	GET_TOKEN,//90
 	
 
 	// Special tokens
@@ -133,13 +133,13 @@ typedef enum _token_list {
 	STRING_TOKEN,
 	ATTRIBUTE_TOKEN, 
 	REAL_NUMBER_TOKEN,
-	INTEGER_TOKEN,
+	INTEGER_TOKEN,//95
 	CHAR_TOKEN,
 
 	// SEPARATOR TOKEN
 	SEPARATOR_TOKEN,
-	EOF_TOKEN,
 
+	EOF_TOKEN
 
 } token;
 
