@@ -24,8 +24,11 @@ global.o: errors.c errors.h
 clean:
 	rm -rf *.o *.c~ *.h~ *.ada~
 
-bp: clean mrproper
-	rm -rf interpreteur 
+bp: clean mrproper clean_output
+	rm interpreteur
+
+clean_output: output
+	rm output
 
 mrproper:
 	rm compilateur
