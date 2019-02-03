@@ -30,9 +30,13 @@ typedef enum _pcode_inst {
 	PRC,
 	NEG, /* Change the number to its negative */
 	NBZ, /* Branch if not equal (the contrary of the BZE) */
+	SPD, /* Instruction to skip the procedure or function definition */
+	RTS, /* Return to address in the stack */
+	JSR, /* Jump to subroutine and add the return address to the stack */
+	FRE, /* Freeing the a number of memory spots in the pile */
 } pcode_inst;
 
-static char inst_table[26][10] = {
+static char inst_table[29][10] = {
 	"ADD", /* Perform addition on the top spots of the stack */
 	"SUB", /* Perform substration on the top spots of the stack */
 	"MUL", /* Perform multiplication on the top spots of the stack */
@@ -58,6 +62,10 @@ static char inst_table[26][10] = {
 	"PRC",
 	"NEG", /* Change the number to its negative */
 	"NBZ",
+	"SPD",
+	"RTS",
+	"JSR",
+	"FRE",
 };
 
 
@@ -122,7 +130,13 @@ void _pseudo_code_fix_bze();
 /* Adding the parameter to the NBZ instruction */
 void _pseudo_code_fix_nbz();
 
-/* Adding the parameter to the BZE instruction with skip */
+/* Adding the parameter to the BRN instruction */
 void _pseudo_code_fix_brn();
+
+/* Adding the parameter to the the SPD instruction */
+void _pseudo_code_fix_spd();
+
+/* Getting the current pseudo code line */
+int _pseudo_code_current_line();
 
 #endif

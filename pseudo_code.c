@@ -174,3 +174,25 @@ void _pseudo_code_fix_nbz() {
 		n = n->previous;
 	}	
 }
+
+
+void _pseudo_code_fix_spd() {
+	boolean fixed = false;
+
+	node *n = current_pcode;
+
+	/* looking for a BZE with a missing argument */
+	while (n != NULL && !fixed) {
+		if (n->line.inst == SPD && n->line.parameter == -1) {
+			fixed = true;
+			n->line.parameter = line_number;
+		}
+		/* Going to the previous instruction */
+		n = n->previous;
+	}	
+}
+
+
+int _pseudo_code_current_line() {
+	return line_number;
+}

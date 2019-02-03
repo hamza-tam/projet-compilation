@@ -2,7 +2,7 @@
 
 
 void _pile_init() {
-	pile_index = 0;				
+	pile_index = 0;		
 	pile_max_index = INIT_PILE_SIZE - 1;
 
 	pile = malloc((pile_max_index + 1) * sizeof(float));

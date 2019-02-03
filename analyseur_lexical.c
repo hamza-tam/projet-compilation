@@ -75,7 +75,7 @@ static void assign_token(token t) {
 	// If we have a token at the argument of the function
 	if (t != NOTHING) {
 		current_symbol.code = t;
-		printf("AFF %i : %s \n", t, current_symbol.word);
+		if (t != SEPARATOR_TOKEN) printf("AFF %i : %s \n", t, current_symbol.word);
 	} 
 	// If we need to find the token
 	else {
@@ -84,7 +84,7 @@ static void assign_token(token t) {
 		for (i = 0; i < TOKEN_LIST_SIZE; i++) {
 			if (strcmp(current_symbol.word, keywords[i]) == 0) {
 				current_symbol.code = i;
-				printf("aff %i : %s \n", i, current_symbol.word);
+				printf("AFF %i : %s \n", i, current_symbol.word);
 				break;
 			}
 		}
@@ -236,10 +236,8 @@ static boolean is_new_line() {
  * Checking if we have reached the end of the file
  */
 static boolean is_end_of_file() {
-	if (current_char == EOF) {
-	printf("yeeeeeees EOF");
+	if (current_char == EOF) 
 		return true;
-}
 
 	return false;
 }
@@ -331,7 +329,10 @@ static void read_character() {
 	next_char();
 
 	if (is_char() || is_numeric()) next_char();
-	else {
+	else if (current_char == '\\') {
+		next_char();
+		next_char();
+	} else {
 		raise_error(CHARACTER_EXPECTED_ERROR);
 		next_char();
 		return;

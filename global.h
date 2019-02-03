@@ -8,7 +8,7 @@
 
 
 #define WORD_LENGTH 200+1
-#define TOKEN_LIST_SIZE 91
+#define TOKEN_LIST_SIZE 92
 
 
 /**
@@ -126,6 +126,7 @@ typedef enum _token_list {
 	// Added keywords tokens
 	PUT_TOKEN,
 	GET_TOKEN,
+	INTEGER_TYPE_TOKEN,
 	
 
 	// Special tokens
@@ -154,6 +155,7 @@ typedef enum _symbol_type {
 	TVAR,
 	TPROC,
 	TOTH,
+	TINT,
 } symbol_type;
 
 
@@ -163,6 +165,8 @@ struct _stored_symbol {
 	enum _symbol_type type;
 	int address;
 	int length;
+	boolean is_const;
+	int offset;
 };
 
 
@@ -184,5 +188,7 @@ int offset;
 
 int state;
 int current_address;
+
+int address_offset;
 
 #endif

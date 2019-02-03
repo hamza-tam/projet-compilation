@@ -2,10 +2,13 @@
 
 
 int pc = 1;
+int debug = false;
 
 int main(int argc, char** argv) {
 	/* Loading the file containing the Pcode */
 	strcpy(interpreter_input_file_name,"output");
+
+	if (argc > 1) debug = true;
 
 	_pseudo_code_init();
 	_pile_init();
@@ -203,12 +206,34 @@ void _interpret_pseudo_code() {
 			else pc++;
 			break;
 
+		case SPD:
+			pc = (int) current_node->line.parameter;
+			break;
+
+		case RTS:
+			pc = _pile_top();
+			break;
+
+		case JSR:
+			hold = _pile_top();
+			_pile_add(pc+1);
+			pc = (int) hold;
+			break;
+
+		case FRE:
+			for (int i = 0; i < (int) current_node->line.parameter; i++) {
+				_pile_top();
+			}
+			pc++;
+			break;
+
 		default:
 			end = true;
 			break;
 		
 		}
-		_pile_show();
+
+		if (debug) _pile_show();
 	}
 
 }
