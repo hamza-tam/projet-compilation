@@ -1,10 +1,10 @@
-procedure test (p:in) is 
- v : integer;
- c: integer;
- a: integre;
+procedure test is 
+ v : Integer;
+ c: Integer;
+ a: Integer;
 begin 
 
-	v:=99;
+	v:=2;
 	if v=2 then v:=3;
 	elsif v=29 then v:=5;	
 	elsif v=27 then v:=12;	

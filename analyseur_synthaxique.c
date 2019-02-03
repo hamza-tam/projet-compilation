@@ -731,11 +731,11 @@ static boolean RELATION(){
 		}
 
 		if (op == EQUAL_TOKEN) _pseudo_code_add_inst(EQL, 0);//Mery		
-		//if (op == LESS_TOKEN) _pseudo_code_add_inst(LSS, 0);//Mery
-		//if (op == LESS_EQUAL_TOKEN) _pseudo_code_add_inst(LEQ, 0);//Mery				
-		//if (op == GREATER_TOKEN) _pseudo_code_add_inst(GT, 0);//Mery
-		//if (op == GREATER_EQUAL_TOKEN) _pseudo_code_add_inst(GEQ, 0);//Mery		
-		//if (op == DIFF_TOKEN) _pseudo_code_add_inst(NEQ, 0);//Mery
+		else if (op == LESS_TOKEN) _pseudo_code_add_inst(LSS, 0);//Mery
+		else if (op == LESS_EQUAL_TOKEN) _pseudo_code_add_inst(LEQ, 0);//Mery				
+		//else if (op == GREATER_TOKEN) _pseudo_code_add_inst(GRT, 0);//Mery
+		else if (op == GREATER_EQUAL_TOKEN) _pseudo_code_add_inst(GEQ, 0);//Mery		
+		else if (op == DIFF_TOKEN) _pseudo_code_add_inst(NEQ, 0);//Mery
 
 				
 	}
