@@ -464,7 +464,7 @@ static boolean ASSIGNEMENT_OR_PROCEDURE_CALL_STATEMENT() {
 	if (current_symbol.code != ID_TOKEN) return false;
 	_pseudo_code_add_inst(LDA, get_address());
 	next_symbol();
-	if(!ASSIGNEMENT_OR_PROCEDURE_CALL_END_STATEMENT()) raise_error(ASSIGNEMENT_OR_PROCEDURE_CALL_END_STATEMENT_ERROR);
+	if (!ASSIGNEMENT_OR_PROCEDURE_CALL_END_STATEMENT()) raise_error(ASSIGNEMENT_OR_PROCEDURE_CALL_END_STATEMENT_ERROR);
 
 	return true;
 }
