@@ -1,25 +1,33 @@
 procedure main is
 
-	v:Integer;
+	v:Character := 'c';
+	c:Integer;
 
-
-	procedure inc is 
-		a:Integer;
-	begin 
+	procedure to_char is 
+		a : Character;
+	begin
 		Get(a);
-		Put(a+1);
+		Put(a);
 		Put('\n');
 	end;
 
 begin 
 
-	loop 
-		Put("Entrez v: ");
-		Get(v);
+	Put("Bienvenue");
+	Put('\n');
+	Put('\n');
+	Put("1 - Transformer en charactere");
+	Put('\n');
+	Put("0 - quitter");
+	Put('\n');
 
-		inc;
+	loop
 
-		exit when v = 0;
+		Get(c);
+		
+		if c = 1 then to_char;
+
+		exit when c = 0;
 	end loop;
 
 end;

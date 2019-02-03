@@ -10,6 +10,7 @@ int symbol_exists();
 int specific_symbol_exists(char *symbol);
 void show_symbol_table();
 int get_address();
+symbol_type get_type();
 
 void set_last_symbol_type(symbol_type t);
 void set_last_symbol_const();

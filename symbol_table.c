@@ -75,6 +75,15 @@ int get_address() {
 }
 
 
+symbol_type get_type() {
+	for (int i = 0; i < symbol_table_size; i++) {
+		if ( strcmp(symbol_table[i].word, current_symbol.word) == 0 ) 
+			return symbol_table[i].type;
+	}
+
+	return -1;
+}
+
 /*
  * Check if a specific symbol already exists in the symbol table
  * return the index of the symbol in the table if it exists
@@ -96,7 +105,7 @@ int _specific_symbol_exists(char *symbol) {
 void show_symbol_table() {
 	printf("\n\n");
 	printf("==========================\n");
-	printf("====Table des symboles====\n");
+	printf("=== Table des symboles ===\n");
 	printf("==========================\n");
 	printf("  Symbole  | Tp |  @ | Of\n");
 	printf("--------------------------\n");
@@ -152,7 +161,7 @@ int _symbol_table_to_free(int start) {
 	int n = 0;
 
 	while (symbol_table[i].offset >= address_offset && i <= symbol_table_size) {
-		if ( (symbol_table[i].type == TVAR || symbol_table[i].type == TINT) && (symbol_table[i].offset == address_offset) ) n++;
+		if ( (symbol_table[i].type == TVAR || symbol_table[i].type == TINT || symbol_table[i].type == TFLT || symbol_table[i].type == TCHR) && (symbol_table[i].offset == address_offset) ) n++;
 		i++;
 	}
 

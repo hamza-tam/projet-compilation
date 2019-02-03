@@ -342,6 +342,10 @@ static boolean OBJECT_DECLARATION () {
 static boolean SUBTYPE_INDICATION() {
 	if (current_symbol.code == INTEGER_TYPE_TOKEN) {
 		set_last_symbol_type(TINT);
+	} else if (current_symbol.code == CHAR_TYPE_TOKEN) {
+		set_last_symbol_type(TCHR);
+	} else if (current_symbol.code == FLOAT_TYPE_TOKEN) {
+		set_last_symbol_type(TFLT);
 	}
 	next_symbol();
 	return true;
@@ -553,6 +557,8 @@ static boolean EXIT_STATEMENT() {
  */
 static boolean WRITE_STATEMENT() {
 
+	current_expression_type = TVAR;
+
 	if (current_symbol.code != PUT_TOKEN) return false;
 	next_symbol();
 
@@ -603,7 +609,10 @@ static boolean WRITE_STATEMENT() {
 		next_symbol();
 	} else {
 		if (!EXPRESSION()) raise_error(SIMPLE_EXPRESSION_ERROR);
-		_pseudo_code_add_inst(PRF, 0);
+		/* Choosing which insctruction to use based on type */
+		if (current_expression_type == TINT) _pseudo_code_add_inst(PRI, 0);
+		else if (current_expression_type == TCHR) _pseudo_code_add_inst(PRC, 0);
+		else _pseudo_code_add_inst(PRF, 0);
 	}
 
 	if (current_symbol.code != CLOSE_PARENTHESIS_TOKEN) raise_error(PF_EXPECTED_ERROR);
@@ -878,13 +887,51 @@ static boolean FACTOR() {
  */
 
 static boolean PRIMARY(){
-	if(current_symbol.code==INTEGER_TOKEN || current_symbol.code==REAL_NUMBER_TOKEN) { 
+	if (current_symbol.code == CHAR_TOKEN) {
+		/* Changing the type of the expression */
+		if (current_expression_type < TCHR) current_expression_type = TCHR;
+		/* The case we have characters */
+		char to_print;
+		if (current_symbol.word[1] == '\\') {
+			/* It's a special character */
+			char to_print;
+
+			switch (current_symbol.word[2]) {
+			case 'n':
+				to_print = '\n';
+				break;
+
+			case 't':
+				to_print = '\t';
+				break;
+
+			default:
+				to_print = '\n';
+				break;
+			}
+		} else {
+			to_print = current_symbol.word[1];
+		}
+
+		_pseudo_code_add_inst(LDI, to_print);
+		next_symbol(); 
+		return true;
+	} else if(current_symbol.code==INTEGER_TOKEN || current_symbol.code==REAL_NUMBER_TOKEN) {
+		/* Changing the type of the expression */
+		if (current_symbol.code == INTEGER_TOKEN) if (current_expression_type < TINT) current_expression_type = TINT;
+		else if (current_expression_type == REAL_NUMBER_TOKEN) current_expression_type = TFLT;
+
 		/* The case where we are using numbers */
 		_pseudo_code_add_inst(LDI, atoi(current_symbol.word));
-		next_symbol(); return true;
+		next_symbol(); 
+		return true;
 	}
 	else if(current_symbol.code==NULL_TOKEN) { next_symbol(); return true;}
-	else if(current_symbol.code==ID_TOKEN) { 
+	else if(current_symbol.code==ID_TOKEN) {
+		/* Getting the type of the variable */
+		if (current_expression_type < get_type()) current_expression_type = get_type();
+
+		/* Generating the code to load the varaiable */
 		_pseudo_code_add_inst(LDA, get_address());
 		_pseudo_code_add_inst(LDV, 0);
 		next_symbol();
