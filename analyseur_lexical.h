@@ -105,6 +105,9 @@ static char keywords[TOKEN_LIST_SIZE][20] = {
 	// Added keywords
 	"Put",
 	"Get",
+	"Integer",
+	"Float",
+	"Character",
 };
 
 

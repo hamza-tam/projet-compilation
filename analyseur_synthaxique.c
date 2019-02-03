@@ -18,10 +18,13 @@ boolean PROGRAM() {
 	next_symbol();
 	
 	boolean result = false;
+	address_offset = 0;
 
 	// Trying to find the grammar to execute
 	if (SUBPROGRAM_BODY()) result = true;
 
+	_pseudo_code_add_inst(LDA, get_first_procedure_address());
+	_pseudo_code_add_inst(JSR, 0);
 	_pseudo_code_add_inst(HLT, 0);
 
 	// Showing the symbol table
@@ -42,6 +45,7 @@ static boolean SUBPROGRAM_BODY(){
 	
 	/* The identifiers declared now are not variables */
 	state = PROCEDURE_NAME;
+	int symbol_table_start = symbol_table_size;
 
 	if(!SUBPROGRAM_SPECIFICATION()) return false;
 	
@@ -61,10 +65,34 @@ static boolean SUBPROGRAM_BODY(){
 	if (current_symbol.code != END_TOKEN) raise_error(END_EXPECTED_ERROR);
 	next_symbol(); 
 	
-	//DESIGNATOR();
+	if (DESIGNATOR()) next_symbol();
+
+	if (current_symbol.code != SEMICOLON_TOKEN) raise_error(SEMICOLON_EXPECTED_ERROR);
+	next_symbol();
+
+	/* Clearing the memory spots used by this sybprogram */
+	int to_clean_spots = _symbol_table_to_free(symbol_table_start);
+	current_address -= to_clean_spots;
+	
+	_pseudo_code_add_inst(FRE, to_clean_spots);
+
+	address_offset--;
+
+	/* Generating the return instruction to the previous subprogram */
+	_pseudo_code_add_inst(RTS, 0);
+	_pseudo_code_fix_spd();
+
 	return true;
 		
 } 
+
+/*
+ * DESIGNATOR ::= name
+ */
+static boolean DESIGNATOR() {
+	if (current_symbol.code == ID_TOKEN) return true;
+	return false;
+}
 
 //SUBPROGRAM_SPECIFICATION := PROCEDURE_SPECIFICATION | FUNCTION_SPECIFICATION
 static boolean SUBPROGRAM_SPECIFICATION () {
@@ -83,7 +111,7 @@ static boolean PROCEDURE_SPECIFICATION(){
 
 	if(!DPUN()) raise_error(DPUN_ERROR); 
 		
-	if(!PARAMETER_PROFILE()) raise_error(PARAMETER_PROFILE_ERROR);
+	PARAMETER_PROFILE();
 		
 	return true;	
 } 
@@ -110,7 +138,12 @@ static boolean DEFINING_IDENTIFIER(){
 	if (symbol_exists() != -1) {
 		raise_error(SYMBOL_EXISTS_ERROR);		
 	} else {
-		if (state == PROCEDURE_NAME) add_symbol(TPROC);
+		if (state == PROCEDURE_NAME) {
+			_pseudo_code_add_inst(SPD, -1);
+			address_offset++;
+			add_symbol(TPROC);
+			set_last_symbol_address(_pseudo_code_current_line());
+		}
 		else if (state == VARIABLE_NAME) {
 			add_symbol(TVAR); 
 			_pseudo_code_add_inst(INT, 1);
@@ -240,7 +273,7 @@ static boolean PROPER_BODY(){
 	
  	if(!SUBPROGRAM_BODY()){
 		if(!PACKAGE_BODY()){
-					if(!PROTECTED_BODY()) return false;
+			if(!PROTECTED_BODY()) return false;
 		}
 	}
  	return true;
@@ -272,12 +305,17 @@ static boolean OBJECT_DECLARATION () {
 	if(!DEFINING_IDENTIFIER_LIST()){
 		return false;
 	}
+
+	int address = get_last_symbol_address();
 	
 	if (current_symbol.code != DEUXPOINTS_TOKEN) {
 		raise_error(DEUXPOINTS_EXPECTED_ERROR);
 	}
 
+	next_symbol();
+
 	if (current_symbol.code == CONSTANT_TOKEN) {
+		set_last_symbol_const();
 		next_symbol();
 	}
 	
@@ -285,10 +323,12 @@ static boolean OBJECT_DECLARATION () {
 		raise_error(SUBTYPE_INDICATION_ERROR);
 	}
 
-	next_symbol();
 	
 	if (current_symbol.code == AFFECTATION_TOKEN) {
+		next_symbol();
+		_pseudo_code_add_inst(LDA, address);
 		if(!EXPRESSION()) raise_error(EXPRESSION_ERROR);
+		_pseudo_code_add_inst(STO, 0);
 	}
 
 	if (current_symbol.code == SEMICOLON_TOKEN) {
@@ -299,7 +339,14 @@ static boolean OBJECT_DECLARATION () {
 }
 
 // where we will define our types //int..
-static boolean SUBTYPE_INDICATION() {	
+static boolean SUBTYPE_INDICATION() {
+	if (current_symbol.code == INTEGER_TYPE_TOKEN) {
+		set_last_symbol_type(TINT);
+	} else if (current_symbol.code == CHAR_TYPE_TOKEN) {
+		set_last_symbol_type(TCHR);
+	} else if (current_symbol.code == FLOAT_TYPE_TOKEN) {
+		set_last_symbol_type(TFLT);
+	}
 	next_symbol();
 	return true;
 }
@@ -332,7 +379,6 @@ static boolean SEQUENCE_OF_STATEMENT() {
  //{LABEL}
  */
 static boolean STATEMENT() {
-	printf("debut Statement\n");
 	// Reading a simple statement or a compound statement
 	//while(LABEL()){}
 	if (SIMPLE_STATEMENT()) return true;
@@ -342,13 +388,11 @@ static boolean STATEMENT() {
 
 
 /**
- * SIMPLE_STATEMENT ::= ASSIGNEMENT_STATEMENT | PROCEDURE_CALL_STATEMENT | EXIT_STATEMENT | SIMPLE_RETURN_STATEMENT | IO_STATEMENT
+ * SIMPLE_STATEMENT ::= ASSIGNEMENT_OR_PROCEDURE_CALL_STATEMENT | EXIT_STATEMENT | SIMPLE_RETURN_STATEMENT | IO_STATEMENT
  */
 static boolean SIMPLE_STATEMENT() {
-	printf("simple Statement\n");
 	if (ASSIGNEMENT_OR_PROCEDURE_CALL_STATEMENT()) return true;
 	else if (SIMPLE_RETURN_STATEMENT()) return true;
-	else if (PROCEDURE_CALL_STATEMENT()) return true;
 	else if (IO_STATEMENT()) return true;
 	else if (EXIT_STATEMENT()) return true;
 	else return false;
@@ -357,7 +401,6 @@ static boolean SIMPLE_STATEMENT() {
 
 // COMPOUND_STATEMENT ::= IF_STATEMENT | CASE_STATEMENT | LOOP_STATEMENT
 static boolean COMPOUND_STATEMENT() {
-	printf("COMPOUND_STATEMENT\n");
 	if(IF_STATEMENT()) return true;
 	else if(CASE_STATEMENT()) return true;
 	else if(LOOP_STATEMENT()) return true;
@@ -394,7 +437,6 @@ static boolean LOOP_STATEMENT() {
 	_pseudo_code_fix_nbz();
 
 	if(current_symbol.code!=END_TOKEN) {
-
 		raise_error(END_EXPECTED_ERROR);
 	}
 
@@ -403,7 +445,7 @@ static boolean LOOP_STATEMENT() {
 	if(current_symbol.code!=LOOP_TOKEN) {
 			raise_error(LOOP_EXPECTED_ERROR);
 	}
-		next_symbol();
+	next_symbol();
 
 	if(current_symbol.code!=SEMICOLON_TOKEN) {
 		raise_error(SEMICOLON_EXPECTED_ERROR);
@@ -458,7 +500,6 @@ static boolean ASSIGNEMENT_STATEMENT() {
 	if (current_symbol.code != SEMICOLON_TOKEN)
 		raise_error(SEMICOLON_EXPECTED_ERROR);
 
-	//printf("Finished reading an assignement statement \n");
 	next_symbol();
 
 	return true;
@@ -468,7 +509,7 @@ static boolean PROCEDURE_CALL_STATEMENT() {
 	if (current_symbol.code != SEMICOLON_TOKEN)
 		return false;
 
-	//printf("Finished reading a procedure call \n");
+	_pseudo_code_add_inst(JSR, 0);
 
 	next_symbol();
 
@@ -477,7 +518,7 @@ static boolean PROCEDURE_CALL_STATEMENT() {
 
 
 /**
- * EXIT_STATEMENT ::= exit [LOOP_NAME] [when CONDITION]
+ * EXIT_STATEMENT ::= exit [LOOP_NAME] [when CONDITION];
  */
 static boolean EXIT_STATEMENT() {
 	// Reading the exit keyword 
@@ -494,6 +535,9 @@ static boolean EXIT_STATEMENT() {
 		_pseudo_code_add_inst(NBZ,-1);
 	}
 
+	if (current_symbol.code != SEMICOLON_TOKEN) raise_error(SEMICOLON_EXPECTED_ERROR);
+	next_symbol(); 
+
 	return true;
 }
 
@@ -502,11 +546,8 @@ static boolean EXIT_STATEMENT() {
  * IO_STATEMENT ::= WRITE_STATEMENT | READ_STATEMENT
  */
  static boolean IO_STATEMENT() {
- 	printf("IO STATEMENT\n");
  	if (WRITE_STATEMENT()) return true;
  	else if (READ_STATEMENT()) return true;
-
- 	printf("FINISHED IO statement\n");
 
  	return false;
  }
@@ -515,24 +556,70 @@ static boolean EXIT_STATEMENT() {
  * WRITE_STATEMENT ::= Put(EXPRESSION);
  */
 static boolean WRITE_STATEMENT() {
-	printf("WRITE_STATEMENT -----------------------------\n");
+
+	current_expression_type = TVAR;
+
 	if (current_symbol.code != PUT_TOKEN) return false;
 	next_symbol();
 
 	if (current_symbol.code != OPEN_PARENTHESIS_TOKEN) raise_error(PO_EXPECTED_ERROR);
 	next_symbol();
 
-	if (!EXPRESSION()) raise_error(SIMPLE_EXPRESSION_ERROR);  
+	if (current_symbol.code == STRING_TOKEN){
+		/*
+		 * Here we want to print strings into the screen
+		 */
+		int s = strlen(current_symbol.word) - 1;
+		/* Loading the string ito the memory */
+		for (int i = 1; i < s; i++) {
+			_pseudo_code_add_inst(LDI, (int) current_symbol.word[i]);
+			_pseudo_code_add_inst(PRC, 0);
+		}
+		next_symbol();
+	} else if (current_symbol.code == CHAR_TOKEN) {
+		/*
+		 * Here we want to print ot the screen a character
+		 */
+		if (current_symbol.word[1] == '\\') {
+			/* It's a special character */
+			char to_print;
+
+			switch (current_symbol.word[2]) {
+			case 'n':
+				to_print = '\n';
+				break;
+
+			case 't':
+				to_print = '\t';
+				break;
+
+			default:
+				to_print = '\n';
+				break;
+			}
+
+			_pseudo_code_add_inst(LDI, to_print);
+
+		} else {
+			/* It's not a special character */
+			_pseudo_code_add_inst(LDI, current_symbol.word[1]);
+		}
+
+		_pseudo_code_add_inst(PRC, 0);
+		next_symbol();
+	} else {
+		if (!EXPRESSION()) raise_error(SIMPLE_EXPRESSION_ERROR);
+		/* Choosing which insctruction to use based on type */
+		if (current_expression_type == TINT) _pseudo_code_add_inst(PRI, 0);
+		else if (current_expression_type == TCHR) _pseudo_code_add_inst(PRC, 0);
+		else _pseudo_code_add_inst(PRF, 0);
+	}
 
 	if (current_symbol.code != CLOSE_PARENTHESIS_TOKEN) raise_error(PF_EXPECTED_ERROR);
 	next_symbol();
 
 	if (current_symbol.code != SEMICOLON_TOKEN) raise_error(SEMICOLON_EXPECTED_ERROR);
 	next_symbol();
-
-	_pseudo_code_add_inst(PRF, 0);
-
-	printf("FINISHED WRITE_STATEMENT ------------------------\n");
 
 	return true;
 }
@@ -541,7 +628,6 @@ static boolean WRITE_STATEMENT() {
  * READ_STATEMENT ::= Get(EXPRESSION);
  */
 static boolean READ_STATEMENT() {
-	printf("READING STATEMENT \n");
 	if (current_symbol.code != GET_TOKEN) return false;
 	next_symbol();
 
@@ -559,8 +645,6 @@ static boolean READ_STATEMENT() {
 
 	if (current_symbol.code != SEMICOLON_TOKEN) raise_error(SEMICOLON_EXPECTED_ERROR);
 	next_symbol();
-
-	printf("FINISHED READING STATEMET\n");
 
 	return true;
 }
@@ -608,9 +692,11 @@ static boolean IF_STATEMENT(){
 	_pseudo_code_add_inst(BRN,-1);
 	_pseudo_code_fix_bze();//Mery
 
+	int counter = 1;
+
 	// {else if CONDITION then SEQUENCE_OF_STATEMENT}
 	while(current_symbol.code==ELSIF_TOKEN){
-		
+		counter++;
 		//indice_brn = line_number;
 		next_symbol();
 		
@@ -655,8 +741,7 @@ static boolean IF_STATEMENT(){
 
 	//Mery
 	
-		_pseudo_code_fix_brn();	
-		_pseudo_code_fix_brn();	
+	for (int i = 0; i < counter; i++) _pseudo_code_fix_brn();
 
 	//indice_brn = line_number;
 	
@@ -797,7 +882,6 @@ static boolean TERM(){
  */
 
 static boolean FACTOR() {
-			printf("FACTOR\n");
 	if(!PRIMARY()) return false;
 		
 	//TODO  [** PRIMARY] 
@@ -817,14 +901,51 @@ static boolean FACTOR() {
  */
 
 static boolean PRIMARY(){
-			printf("PRIMARY\n");
-	if(current_symbol.code==INTEGER_TOKEN || current_symbol.code==REAL_NUMBER_TOKEN) { 
+	if (current_symbol.code == CHAR_TOKEN) {
+		/* Changing the type of the expression */
+		if (current_expression_type < TCHR) current_expression_type = TCHR;
+		/* The case we have characters */
+		char to_print;
+		if (current_symbol.word[1] == '\\') {
+			/* It's a special character */
+			char to_print;
+
+			switch (current_symbol.word[2]) {
+			case 'n':
+				to_print = '\n';
+				break;
+
+			case 't':
+				to_print = '\t';
+				break;
+
+			default:
+				to_print = '\n';
+				break;
+			}
+		} else {
+			to_print = current_symbol.word[1];
+		}
+
+		_pseudo_code_add_inst(LDI, to_print);
+		next_symbol(); 
+		return true;
+	} else if(current_symbol.code==INTEGER_TOKEN || current_symbol.code==REAL_NUMBER_TOKEN) {
+		/* Changing the type of the expression */
+		if (current_symbol.code == INTEGER_TOKEN) if (current_expression_type < TINT) current_expression_type = TINT;
+		else if (current_expression_type == REAL_NUMBER_TOKEN) current_expression_type = TFLT;
+
 		/* The case where we are using numbers */
 		_pseudo_code_add_inst(LDI, atoi(current_symbol.word));
-		next_symbol(); return true;
+		next_symbol(); 
+		return true;
 	}
 	else if(current_symbol.code==NULL_TOKEN) { next_symbol(); return true;}
-	else if(current_symbol.code==ID_TOKEN) { 
+	else if(current_symbol.code==ID_TOKEN) {
+		/* Getting the type of the variable */
+		if (current_expression_type < get_type()) current_expression_type = get_type();
+
+		/* Generating the code to load the varaiable */
 		_pseudo_code_add_inst(LDA, get_address());
 		_pseudo_code_add_inst(LDV, 0);
 		next_symbol();
@@ -855,7 +976,6 @@ static boolean PRIMARY(){
  */
 
 static boolean UNARY_ADDING_OPERATOR(){
-			printf("UNARY_ADDING_OPERATOR\n");
 	if(current_symbol.code==PLUS_TOKEN) { next_symbol();  true;}
 	else if(current_symbol.code==SUBSTRACT_TOKEN) { next_symbol();  true;}
 	else return false;
@@ -866,7 +986,6 @@ static boolean UNARY_ADDING_OPERATOR(){
  */
 
 static boolean BINARY_ADDING_OPERATOR(){
-				printf("BINARY_ADDING_OPERATOR\n");
 	if(current_symbol.code==PLUS_TOKEN) { next_symbol(); return true;}
 	else if(current_symbol.code==SUBSTRACT_TOKEN) {next_symbol(); return true;}
 	// TODO FIND THE THE NAME OF TOKEN &   else if(current_symbol.code=="&") { return true;}
@@ -892,7 +1011,6 @@ static boolean MULTIPLYING_OPERATOR(){
  * CONDITION ::= EXPRESSION
  */
 static boolean CONDITION() {
-				printf("CONDITION\n");
 	if(EXPRESSION()) return true;
 	return false;
 
@@ -904,9 +1022,8 @@ static boolean CONDITION() {
  */
 
 static boolean  RELATION_OPERATOR(){
-				printf("RELATION_OPERATOR\n");
 	if(current_symbol.code==EQUAL_TOKEN) { next_symbol(); return true;}
-        else if(current_symbol.code==DIFF_TOKEN) { next_symbol(); return true;}
+    else if(current_symbol.code==DIFF_TOKEN) { next_symbol(); return true;}
 	else if(current_symbol.code==LESS_TOKEN) { next_symbol(); return true;}
 	else if(current_symbol.code==LESS_EQUAL_TOKEN) { next_symbol(); return true;}
 	else if(current_symbol.code==GREATER_TOKEN) { next_symbol(); return true;}

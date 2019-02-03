@@ -35,8 +35,10 @@ boolean add_symbol(symbol_type t) {
 		// adding the symbol to the table
 		strcpy(symbol_table[symbol_table_size].word, current_symbol.word);
 		symbol_table[symbol_table_size].type = t;
+		symbol_table[symbol_table_size].is_const = false;
+		symbol_table[symbol_table_size].offset = address_offset;
 
-		if (t == TVAR) symbol_table[symbol_table_size].address = current_address++;
+		if (t == TVAR) symbol_table[symbol_table_size].address = address_offset + current_address++;
 		
 		// Incrementing the symbol table size
 		symbol_table_size++;
@@ -73,6 +75,15 @@ int get_address() {
 }
 
 
+symbol_type get_type() {
+	for (int i = 0; i < symbol_table_size; i++) {
+		if ( strcmp(symbol_table[i].word, current_symbol.word) == 0 ) 
+			return symbol_table[i].type;
+	}
+
+	return -1;
+}
+
 /*
  * Check if a specific symbol already exists in the symbol table
  * return the index of the symbol in the table if it exists
@@ -92,11 +103,67 @@ int _specific_symbol_exists(char *symbol) {
  * Printing into the screen the symbol table
  */
 void show_symbol_table() {
-	printf("===============================\n");
-	printf("Symbol table \n");
-	printf("===============================\n");
+	printf("\n\n");
+	printf("==========================\n");
+	printf("=== Table des symboles ===\n");
+	printf("==========================\n");
+	printf("  Symbole  | Tp |  @ | Of\n");
+	printf("--------------------------\n");
 
 	for(int i = 0; i < symbol_table_size; i++) {
-		printf("--> %s \n", symbol_table[i].word);
+		printf("%10s | %2i | %2i | %2i \n", symbol_table[i].word, symbol_table[i].type, symbol_table[i].address, symbol_table[i].offset);
 	}
+}
+
+/*
+ * Changing the last symbol typ
+ */
+void set_last_symbol_type(symbol_type t) {
+	symbol_table[symbol_table_size - 1].type = t;
+}
+
+
+/*
+ * Setting the last symbol address
+ */
+void set_last_symbol_address(int address) {
+	symbol_table[symbol_table_size - 1].address = address;
+}
+
+/*
+ * Set the last symbol to const
+ */
+void set_last_symbol_const() {
+	symbol_table[symbol_table_size - 1].is_const = true;
+}
+
+/*
+ * Getting the address of the last inserted symbol in the table
+ */
+int get_last_symbol_address() {
+	return symbol_table[symbol_table_size - 1].address;
+}
+
+/*
+ * Getting the address of the first procedure in the symbol table
+ */
+int get_first_procedure_address() {
+	int i = 0;
+	while(symbol_table[i].type != TPROC) i++;
+	return symbol_table[i].address;
+}
+
+/*
+ * Get the number of variables to clean
+ */
+int _symbol_table_to_free(int start) {
+	int i = start;
+	int n = 0;
+
+	while (symbol_table[i].offset >= address_offset && i <= symbol_table_size) {
+		if ( (symbol_table[i].type == TVAR || symbol_table[i].type == TINT || symbol_table[i].type == TFLT || symbol_table[i].type == TCHR) && (symbol_table[i].offset == address_offset) ) n++;
+		i++;
+	}
+
+	return n;
 }
