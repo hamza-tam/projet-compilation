@@ -522,7 +522,7 @@ static boolean FOR_LOOP_STATEMENT() {
 
 	next_symbol();
 	int id_adrr = get_address(); 
-	_pseudo_code_add_inst(LDA, id_adrr);
+
 
 	if (current_symbol.code != ID_TOKEN) raise_error(IDENTIFIER_EXPECTED_ERROR);
 	next_symbol();
@@ -532,19 +532,27 @@ static boolean FOR_LOOP_STATEMENT() {
 
 
 	int val1 = atoi(current_symbol.word);
-	int indice = val1;
-	if (current_symbol.code == INTEGER_TOKEN) next_symbol();
+			_pseudo_code_add_inst(LDA, id_adrr);
+			_pseudo_code_add_inst(LDI, val1);
+			_pseudo_code_add_inst(STO, 0);
 
-	if (current_symbol.code == POINT_POINT_TOKEN) next_symbol();
+	next_symbol();
+
+	next_symbol();
 
 	int val2 = atoi(current_symbol.word);
-	if (current_symbol.code == INTEGER_TOKEN) next_symbol();
+	next_symbol();
+
+
+	//test
 	
 	int indice_brn = line_number;
 
 	//test
+			_pseudo_code_add_inst(LDA, id_adrr);
+			_pseudo_code_add_inst(LDV , 0);			
 			_pseudo_code_add_inst(LDI, val2);
-			_pseudo_code_add_inst(EQL, 0);
+			_pseudo_code_add_inst(LEQ, 0);
 	//test
 
 		//BZE
@@ -557,12 +565,12 @@ static boolean FOR_LOOP_STATEMENT() {
 	if(!SEQUENCE_OF_STATEMENT()) raise_error(SEQUENCE_STATEMENT_ERROR);
 
 //
-
+			_pseudo_code_add_inst(LDA, id_adrr);
 			_pseudo_code_add_inst(LDA, id_adrr);
 			_pseudo_code_add_inst(LDV , 0);			
 			_pseudo_code_add_inst(LDI, 1);			
-			_pseudo_code_add_inst(ADD,0);			
-			_pseudo_code_add_inst(STO,0);
+			_pseudo_code_add_inst(ADD, 0);			
+			_pseudo_code_add_inst(STO, 0);
 //
 
 	_pseudo_code_add_inst(BRN,indice_brn);

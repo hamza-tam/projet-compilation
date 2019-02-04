@@ -109,6 +109,7 @@ static char keywords[TOKEN_LIST_SIZE][20] = {
 	"Integer",
 	"Float",
 	"Character",
+	".."
 	
 };
 
@@ -153,7 +154,7 @@ void init_symbol();
 */
 static void read_numeral();
 static void read_decimal_literal();
-
+static void point_point_char();
 
 
 #endif

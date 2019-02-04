@@ -8,7 +8,7 @@
 
 
 #define WORD_LENGTH 200+1
-#define TOKEN_LIST_SIZE 95
+#define TOKEN_LIST_SIZE 96
 
 
 /**
@@ -144,7 +144,9 @@ typedef enum _token_list {
 	SEPARATOR_TOKEN,
 
 	EOF_TOKEN,
-	COMMENT_TOKEN
+	COMMENT_TOKEN,
+	POINT_POINT_TOKEN,
+	POINT_TOKEN
 
 } token;
 

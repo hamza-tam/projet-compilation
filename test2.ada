@@ -4,20 +4,20 @@ procedure main is
 	y:Integer;
 
 begin 
-	
-	x:=0;
+
 	y:=0;
 
-	for x in 2 .. 5 
-	LOOP
+	for x in 3 .. 10 
+	loop
 		y:= y+1;
-	end LOOP;
+	end loop;
 
+		
 
-Put('x');Put('\n');
-Put(x);
-Put('y');Put('\n');
-Put(y);
+	Put('\n');
+	Put(x);
+	Put('\n');
+	Put(y);
 
 end;
 

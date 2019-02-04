@@ -26,6 +26,7 @@ void next_symbol() {
 
 		// search for the grammar
 		if (is_end_of_file()) read_end_of_file();
+		else if (is_point_char()) point_point_char();
 		else if(is_numeric()) read_number();
 		else if (is_minus_or_comment()) read_minus_or_comment();
 		else if (is_special()) read_special();
@@ -459,5 +460,23 @@ static void read_decimal_literal(){
 		// is an integer number
 		assign_token(INTEGER_TOKEN);
 	}
+	
+}
+
+
+/*
+ * read .. symbol
+ */
+static void point_point_char(){
+	// Moving to the next character
+	next_char();
+	if(is_point_char()){
+		next_char();
+		assign_token(POINT_POINT_TOKEN);
+	}else{
+		assign_token(POINT_TOKEN);
+	}
+
+	
 	
 }
