@@ -472,7 +472,7 @@ static boolean ASSIGNEMENT_OR_PROCEDURE_CALL_STATEMENT() {
 	if (current_symbol.code != ID_TOKEN) return false;
 	_pseudo_code_add_inst(LDA, get_address());
 	next_symbol();
-	if(!ASSIGNEMENT_OR_PROCEDURE_CALL_END_STATEMENT()) raise_error(ASSIGNEMENT_OR_PROCEDURE_CALL_END_STATEMENT_ERROR);
+	if (!ASSIGNEMENT_OR_PROCEDURE_CALL_END_STATEMENT()) raise_error(ASSIGNEMENT_OR_PROCEDURE_CALL_END_STATEMENT_ERROR);
 
 	return true;
 }
@@ -699,9 +699,11 @@ static boolean IF_STATEMENT(){
 	_pseudo_code_add_inst(BRN,-1);
 	_pseudo_code_fix_bze();//Mery
 
+	int counter = 1;
+
 	// {else if CONDITION then SEQUENCE_OF_STATEMENT}
 	while(current_symbol.code==ELSIF_TOKEN){
-		
+		counter++;
 		//indice_brn = line_number;
 		next_symbol();
 		
@@ -746,8 +748,7 @@ static boolean IF_STATEMENT(){
 
 	//Mery
 	
-		_pseudo_code_fix_brn();	
-		_pseudo_code_fix_brn();	
+	for (int i = 0; i < counter; i++) _pseudo_code_fix_brn();
 
 	//indice_brn = line_number;
 	
@@ -822,11 +823,11 @@ static boolean RELATION(){
 		}
 
 		if (op == EQUAL_TOKEN) _pseudo_code_add_inst(EQL, 0);//Mery		
-		//if (op == LESS_TOKEN) _pseudo_code_add_inst(LSS, 0);//Mery
-		//if (op == LESS_EQUAL_TOKEN) _pseudo_code_add_inst(LEQ, 0);//Mery				
-		//if (op == GREATER_TOKEN) _pseudo_code_add_inst(GT, 0);//Mery
-		//if (op == GREATER_EQUAL_TOKEN) _pseudo_code_add_inst(GEQ, 0);//Mery		
-		//if (op == DIFF_TOKEN) _pseudo_code_add_inst(NEQ, 0);//Mery
+		else if (op == LESS_TOKEN) _pseudo_code_add_inst(LSS, 0);//Mery
+		else if (op == LESS_EQUAL_TOKEN) _pseudo_code_add_inst(LEQ, 0);//Mery				
+		//else if (op == GREATER_TOKEN) _pseudo_code_add_inst(GRT, 0);//Mery
+		else if (op == GREATER_EQUAL_TOKEN) _pseudo_code_add_inst(GEQ, 0);//Mery		
+		else if (op == DIFF_TOKEN) _pseudo_code_add_inst(NEQ, 0);//Mery
 
 				
 	}
