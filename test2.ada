@@ -1,21 +1,21 @@
-procedure main is
+procedure remplir_tableau is
+	
+	x : Integer;
 
-	x:Integer;	
-	y:Integer;
+	procedure rec is
+
+	begin 
+		if x < 5 then 
+			Put(x);
+			x := x + 1;
+			rec;
+		end if;
+	end;
 
 begin 
 
-	x:=10;
-	y:=5.5;
+	x := 0;
 
-	if x <= 1 xor y<5 then
-		x := x - 2;
-		y:= y+1;
-	end if;
-
-Put('x');Put('\n');
-Put(x);
-Put('y');Put('\n');
-Put(y);
+	rec;
 
 end;

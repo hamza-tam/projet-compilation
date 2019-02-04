@@ -346,6 +346,37 @@ static boolean SUBTYPE_INDICATION() {
 		set_last_symbol_type(TCHR);
 	} else if (current_symbol.code == FLOAT_TYPE_TOKEN) {
 		set_last_symbol_type(TFLT);
+	} else if (current_symbol.code == ARRAY_TOKEN) {
+		/*
+		 * This is where we start declaring the array
+		 */
+		 next_symbol();
+
+		 if (current_symbol.code != OPEN_PARENTHESIS_TOKEN) raise_error(PO_EXPECTED_ERROR);
+		 next_symbol();
+
+		 if (current_symbol.code != INTEGER_TOKEN) raise_error(INTEGER_EXPECTED_ERROR);
+		 int start = atoi(current_symbol.word);
+		 set_last_symbol_start(start);
+		 next_symbol();
+
+		 if (current_symbol.code != POINT_POINT_TOKEN) raise_error(POINT_POINT_EXPECTED_ERROR);
+		 next_symbol();
+
+		 if (current_symbol.code != INTEGER_TOKEN) raise_error(INTEGER_EXPECTED_ERROR);
+		 int end = atoi(current_symbol.word);
+		 set_last_symbol_end(end);
+		 next_symbol();
+
+		 if (current_symbol.code != CLOSE_PARENTHESIS_TOKEN) raise_error(CLOSE_PARENTHESIS_TOKEN_ERROR);
+		 next_symbol();
+
+		 if (current_symbol.code != OF_TOKEN) raise_error(OF_EXPECTED_ERROR);
+		 next_symbol();
+
+		 if (current_symbol.code == INTEGER_TYPE_TOKEN) set_last_symbol_type(TINT);
+
+		 _pseudo_code_add_inst(INT, end-start);		 
 	}
 	next_symbol();
 	return true;
@@ -602,7 +633,26 @@ static boolean ASSIGNEMENT_OR_PROCEDURE_CALL_STATEMENT() {
 	if (is_current_symbol_const()) raise_error(ASSIGNEMENT_TO_CONST_ERROR);
 
 	_pseudo_code_add_inst(LDA, get_address());
+	int s = get_symbol_start();
+	int e = get_symbol_end();
 	next_symbol();
+
+	if (current_symbol.code == OPEN_PARENTHESIS_TOKEN) {
+		next_symbol();
+		if (current_symbol.code == INTEGER_TOKEN) {
+			_pseudo_code_add_inst(LDI, atoi(current_symbol.word) - s);
+		} else if (current_symbol.code == ID_TOKEN) {
+			_pseudo_code_add_inst(LDA, get_address());
+			_pseudo_code_add_inst(LDV, 0);
+			_pseudo_code_add_inst(LDI, s);
+			_pseudo_code_add_inst(SUB, 0);
+		}
+		_pseudo_code_add_inst(ADD, 0);
+		next_symbol();
+		if (current_symbol.code != CLOSE_PARENTHESIS_TOKEN) raise_error(PF_EXPECTED_ERROR);
+		next_symbol();
+	} 
+
 	if (!ASSIGNEMENT_OR_PROCEDURE_CALL_END_STATEMENT()) raise_error(ASSIGNEMENT_OR_PROCEDURE_CALL_END_STATEMENT_ERROR);
 
 	return true;
@@ -775,9 +825,30 @@ static boolean READ_STATEMENT() {
 
 	if (current_symbol.code != ID_TOKEN) raise_error(IDENTIFIER_EXPECTED_ERROR);
 	_pseudo_code_add_inst(LDA, get_address());
+	
+	int s = get_symbol_start();
+	int e = get_symbol_end();
+
+	next_symbol();
+
+	if (current_symbol.code == OPEN_PARENTHESIS_TOKEN) {
+		next_symbol();
+		if (current_symbol.code == INTEGER_TOKEN) {
+			_pseudo_code_add_inst(LDI, atoi(current_symbol.word) - s);
+		} else if (current_symbol.code == ID_TOKEN) {
+			_pseudo_code_add_inst(LDA, get_address());
+			_pseudo_code_add_inst(LDV, 0);
+			_pseudo_code_add_inst(LDI, s);
+			_pseudo_code_add_inst(SUB, 0);
+		}
+		_pseudo_code_add_inst(ADD, 0);
+		next_symbol();
+		if (current_symbol.code != CLOSE_PARENTHESIS_TOKEN) raise_error(PF_EXPECTED_ERROR);
+		next_symbol();
+	} 
+
 	_pseudo_code_add_inst(RDF, 0);
 	_pseudo_code_add_inst(STO, 0);
-	next_symbol();
 
 	if (current_symbol.code != CLOSE_PARENTHESIS_TOKEN) raise_error(PF_EXPECTED_ERROR);
 	next_symbol();
@@ -1101,8 +1172,30 @@ static boolean PRIMARY(){
 
 		/* Generating the code to load the varaiable */
 		_pseudo_code_add_inst(LDA, get_address());
-		_pseudo_code_add_inst(LDV, 0);
+		
+		int s = get_symbol_start();
+		int e = get_symbol_end();
+
 		next_symbol();
+
+		if (current_symbol.code == OPEN_PARENTHESIS_TOKEN) {
+			next_symbol();
+			if (current_symbol.code == INTEGER_TOKEN) {
+				_pseudo_code_add_inst(LDI, atoi(current_symbol.word) - s);
+			} else if (current_symbol.code == ID_TOKEN) {
+				_pseudo_code_add_inst(LDA, get_address());
+				_pseudo_code_add_inst(LDV, 0);
+				_pseudo_code_add_inst(LDI, s);
+				_pseudo_code_add_inst(SUB, 0);
+			}
+			_pseudo_code_add_inst(ADD, 0);
+			next_symbol();
+			if (current_symbol.code != CLOSE_PARENTHESIS_TOKEN) raise_error(PF_EXPECTED_ERROR);
+			next_symbol();
+		} 
+
+		_pseudo_code_add_inst(LDV, 0);
+
 		return true;
 	}
 	else if(current_symbol.code==STRING_TOKEN) { next_symbol(); return true;}

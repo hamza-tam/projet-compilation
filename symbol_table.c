@@ -34,9 +34,10 @@ boolean add_symbol(symbol_type t) {
 		}
 		// adding the symbol to the table
 		strcpy(symbol_table[symbol_table_size].word, current_symbol.word);
-		symbol_table[symbol_table_size].type = t;
+		symbol_table[symbol_table_size].type     = t;
 		symbol_table[symbol_table_size].is_const = false;
-		symbol_table[symbol_table_size].offset = address_offset;
+		symbol_table[symbol_table_size].offset   = address_offset;
+		symbol_table[symbol_table_size].end      = 0;
 
 		if (t == TVAR) symbol_table[symbol_table_size].address = address_offset + current_address++;
 		
@@ -104,14 +105,14 @@ int _specific_symbol_exists(char *symbol) {
  */
 void show_symbol_table() {
 	printf("\n\n");
-	printf("===============================\n");
-	printf("=== Table des symboles ========\n");
-	printf("===============================\n");
-	printf("  Symbole  | Tp |  @ | Of | Ct\n");
-	printf("-------------------------------\n");
+	printf("====================================\n");
+	printf("=== Table des symboles =============\n");
+	printf("====================================\n");
+	printf("  Symbole  | Tp |  @ | Of | Ct | ed \n");
+	printf("------------------------------------\n");
 
 	for(int i = 0; i < symbol_table_size; i++) {
-		printf("%10s | %2i | %2i | %2i | %2i \n", symbol_table[i].word, symbol_table[i].type, symbol_table[i].address, symbol_table[i].offset, symbol_table[i].is_const);
+		printf("%10s | %2i | %2i | %2i | %2i | %2i \n", symbol_table[i].word, symbol_table[i].type, symbol_table[i].address, symbol_table[i].offset, symbol_table[i].is_const, symbol_table[i].end);
 	}
 }
 
@@ -128,6 +129,20 @@ void set_last_symbol_type(symbol_type t) {
  */
 void set_last_symbol_address(int address) {
 	symbol_table[symbol_table_size - 1].address = address;
+}
+
+/*
+ * Setting the last symbol start
+ */
+void set_last_symbol_start(int start) {
+	symbol_table[symbol_table_size - 1].start = start;
+}
+
+/*
+ * Setting the last symbol end
+ */
+void set_last_symbol_end(int end) {
+	symbol_table[symbol_table_size - 1].end = end;
 }
 
 /*
@@ -159,6 +174,20 @@ int get_first_procedure_address() {
 }
 
 /*
+ * Getting the end of a symbol in the table
+ */
+int get_symbol_end() {
+	return symbol_table[symbol_exists()].end;
+}
+
+/*
+ * Getting the start of a symbol in the table
+ */
+int get_symbol_start() {
+	return symbol_table[symbol_exists()].start;
+}
+
+/*
  * Get the number of variables to clean
  */
 int _symbol_table_to_free(int start) {
@@ -167,6 +196,9 @@ int _symbol_table_to_free(int start) {
 
 	while (symbol_table[i].offset >= address_offset && i <= symbol_table_size) {
 		if ( (symbol_table[i].type == TVAR || symbol_table[i].type == TINT || symbol_table[i].type == TFLT || symbol_table[i].type == TCHR) && (symbol_table[i].offset == address_offset) ) n++;
+		if (symbol_table[i].end != 0) {
+			n += symbol_table[i].end - symbol_table[i].start;
+		}
 		i++;
 	}
 

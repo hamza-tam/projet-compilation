@@ -177,6 +177,10 @@ struct _stored_symbol {
 	int length;
 	boolean is_const;
 	int offset;
+
+	/* For arrays */
+	int start;
+	int end;
 };
 
 
