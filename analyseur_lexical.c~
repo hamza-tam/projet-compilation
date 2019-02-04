@@ -26,7 +26,6 @@ void next_symbol() {
 
 		// search for the grammar
 		if (is_end_of_file()) read_end_of_file();
-		else if (is_point_char()) point_point_char();
 		else if(is_numeric()) read_number();
 		else if (is_minus_or_comment()) read_minus_or_comment();
 		else if (is_special()) read_special();

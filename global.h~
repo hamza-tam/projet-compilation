@@ -144,9 +144,7 @@ typedef enum _token_list {
 	SEPARATOR_TOKEN,
 
 	EOF_TOKEN,
-	COMMENT_TOKEN,
-	POINT_POINT_TOKEN,
-	POINT_TOKEN
+	COMMENT_TOKEN
 
 } token;
 

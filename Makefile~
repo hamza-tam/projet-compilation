@@ -7,7 +7,7 @@ compilateur.o: compilateur.c analyseur_synthaxique.h global.h analyseur_synthaxi
 	gcc -o compilateur.o -c compilateur.c -g
 
 analyseur_synthaxique.o: analyseur_synthaxique.c analyseur_synthaxique.h analyseur_lexical.h global.h errors.h symbol_table.h
-	gcc -std=gnu99 -o analyseur_synthaxique.o -c analyseur_synthaxique.c -g
+	gcc -o analyseur_synthaxique.o -c analyseur_synthaxique.c -g
 
 pseudo_code.o: pseudo_code.h pseudo_code.c global.h
 	gcc -o pseudo_code.o -c pseudo_code.c -g

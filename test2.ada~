@@ -6,7 +6,7 @@ procedure main is
 begin 
 
 	x:=10;
-	y:=5.5;
+	y:=5;
 
 	if x <= 1 xor y<5 then
 		x := x - 2;
