@@ -8,7 +8,7 @@
 
 
 #define WORD_LENGTH 200+1
-#define TOKEN_LIST_SIZE 94
+#define TOKEN_LIST_SIZE 95
 
 
 /**
@@ -122,6 +122,7 @@ typedef enum _token_list {
 	SEMICOLON_TOKEN,
 	DEUXPOINTS_TOKEN,
 	DIFF_TOKEN,
+	NEXT_TOKEN,
 
 	// Added keywords tokens
 	PUT_TOKEN,
