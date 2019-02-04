@@ -1,17 +1,21 @@
-procedure main is 
+procedure main is
 
-	c : Integer;
+	x:Integer;	
+	y:Integer;
 
-begin
+begin 
 	
-	Put('\n');
-	Put("BIENVENUE");
-	Put('\n');
+	x:=10;
+	y:=5;
 
-	while c /= 0 loop
+	if x <= 1 xor y<5 then
+		x := x - 2;
+		y:= y+1;
+	end if;
 
-		afficher_menu;
-
-	end loop; 
+Put('x');Put('\n');
+Put(x);
+Put('y');Put('\n');
+Put(y);
 
 end;

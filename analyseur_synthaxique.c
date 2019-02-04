@@ -485,12 +485,19 @@ static boolean WHILE_LOOP_STATEMENT() {
 	if (current_symbol.code != WHILE_TOKEN) return false;
 	next_symbol();
 
+	//indice
+	int indice_brn = line_number;
 	if (!CONDITION()) raise_error(CONDITION_ERROR);
+	_pseudo_code_add_inst(BZE, -1);
 
 	if (current_symbol.code != LOOP_TOKEN) raise_error(LOOP_EXPECTED_ERROR);
 	next_symbol();
 
 	if(!SEQUENCE_OF_STATEMENT()) raise_error(SEQUENCE_STATEMENT_ERROR);
+
+	//BRN
+	_pseudo_code_add_inst(BRN,indice_brn);
+	_pseudo_code_fix_bze();//Mery
 
 	if (current_symbol.code != END_TOKEN) raise_error(END_EXPECTED_ERROR);
 	next_symbol();
@@ -498,6 +505,9 @@ static boolean WHILE_LOOP_STATEMENT() {
 	if (current_symbol.code == LOOP_TOKEN) next_symbol();
 
 	if (current_symbol.code != SEMICOLON_TOKEN) raise_error(SEMICOLON_EXPECTED_ERROR);
+
+
+	
 	next_symbol(); 
 
 	return true;
@@ -884,8 +894,14 @@ static boolean IF_STATEMENT(){
  */
 
 static boolean EXPRESSION(){
+
+
 	if(!RELATION()) return false;	
 	
+	token op;//Mery
+	op = current_symbol.code;
+
+
 	// { and RELATION }
 	if(current_symbol.code==AND_TOKEN) {
 		while (current_symbol.code==AND_TOKEN){
@@ -893,6 +909,8 @@ static boolean EXPRESSION(){
 			if(!RELATION()) {
 					raise_error(RELATION_EXPECTED_ERROR);
 			}
+			_pseudo_code_add_inst(MUL, 0);
+
 			
 		}
 	
@@ -905,6 +923,8 @@ static boolean EXPRESSION(){
 			if(!RELATION()) {
 					raise_error(RELATION_EXPECTED_ERROR);
 			}
+			_pseudo_code_add_inst(ADD, 0);
+
 			
 		}
 	
@@ -917,6 +937,9 @@ static boolean EXPRESSION(){
 			if(!RELATION()) {
 					raise_error(RELATION_EXPECTED_ERROR);
 			}
+			_pseudo_code_add_inst(ADD, 0);
+			_pseudo_code_add_inst(LDI, 1);
+			_pseudo_code_add_inst(EQL, 0);
 			
 		}
 
@@ -947,7 +970,7 @@ static boolean RELATION(){
 		if (op == EQUAL_TOKEN) _pseudo_code_add_inst(EQL, 0);//Mery		
 		else if (op == LESS_TOKEN) _pseudo_code_add_inst(LSS, 0);//Mery
 		else if (op == LESS_EQUAL_TOKEN) _pseudo_code_add_inst(LEQ, 0);//Mery				
-		//else if (op == GREATER_TOKEN) _pseudo_code_add_inst(GRT, 0);//Mery
+		else if (op == GREATER_TOKEN) _pseudo_code_add_inst(GTR, 0);//Mery
 		else if (op == GREATER_EQUAL_TOKEN) _pseudo_code_add_inst(GEQ, 0);//Mery		
 		else if (op == DIFF_TOKEN) _pseudo_code_add_inst(NEQ, 0);//Mery
 

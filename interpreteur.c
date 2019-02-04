@@ -62,6 +62,8 @@ void _interpret_pseudo_code() {
 		/* Getting the current instruction */
 		_interpreter_get_current_node();
 
+printf("*********%i\n",pc);
+
 		/* processing the instruction */
 		switch (current_node->line.inst) {
 
