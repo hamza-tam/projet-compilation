@@ -35,6 +35,7 @@ procedure main is
 			i:=i+1;
 		end;
 
+
 		-- affichage
 		i:=2;
 		while i <= 5 loop
@@ -66,3 +67,5 @@ begin
 		exit when c = 0;
 	end loop;
 end;
+
+
