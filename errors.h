@@ -45,6 +45,8 @@ typedef enum _error_codes {
 	SYMBOL_EXISTS_ERROR,
 
 	LOOP_EXPECTED_ERROR,
+	SYMBOL_DONT_EXIST,
+	ASSIGNEMENT_TO_CONST_ERROR,
 
 } error_code;
 

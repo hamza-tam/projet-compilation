@@ -41,6 +41,10 @@ static boolean IO_STATEMENT();
 static boolean WRITE_STATEMENT();
 static boolean READ_STATEMENT();
 
+static boolean WHILE_LOOP_STATEMENT();
+static boolean FOR_LOOP_STATEMENT();
+static boolean LOOP_STATEMENT();
+
 
 static boolean HANDLED_STATEMENT_OF_SEQUENCE();
 static boolean SEQUENCE_OF_STATEMENT();
@@ -50,7 +54,7 @@ static boolean COMPOUND_STATEMENT();
 
 
 static boolean CASE_STATEMENT();
-static boolean LOOP_STATEMENT();
+static boolean LOOP_STATEMENTS();
 
 static boolean ASSIGNEMENT_OR_PROCEDURE_CALL_STATEMENT();
 static boolean ASSIGNEMENT_OR_PROCEDURE_CALL_END_STATEMENT();

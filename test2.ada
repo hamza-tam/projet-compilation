@@ -1,14 +1,23 @@
+
 procedure main is
 
-	v:Integer;
+	x:Integer;	
+	y:Integer;
 
 begin 
-	v:=2;
-	if v=22 then v:=3;
+	
+	x:=10;
+	y:=5;
+
+	if x <= 1 xor y<5 then
+		x := x - 2;
+		y:= y+1;
 	end if;
 
-		Put(v);
-		Put('\n');
+Put('x');Put('\n');
+Put(x);
+Put('y');Put('\n');
+Put(y);
 
 end;
 
