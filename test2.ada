@@ -14,18 +14,20 @@ procedure main is
 begin 
 
 	Put("Bienvenue");
-	Put('\n');
-	Put('\n');
-	Put("1 - Transformer en charactere");
-	Put('\n');
-	Put("0 - quitter");
-	Put('\n');
 
 	loop
+
+		Put('\n');
+		Put('\n');
+		Put("1 - Transformer en charactere");
+		Put('\n');
+		Put("0 - quitter");
+		Put('\n');
 
 		Get(c);
 		
 		if c = 1 then to_char;
+		end if;
 
 		exit when c = 0;
 	end loop;

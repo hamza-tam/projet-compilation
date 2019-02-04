@@ -144,7 +144,7 @@ static boolean is_special() {
 		case ')':
 		case '>':
 		case '<':
-		case '/':		
+		case '/':
 			return true; break;
 
 		default: 

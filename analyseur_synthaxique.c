@@ -347,6 +347,7 @@ static boolean SUBTYPE_INDICATION() {
 	} else if (current_symbol.code == FLOAT_TYPE_TOKEN) {
 		set_last_symbol_type(TFLT);
 	}
+	
 	next_symbol();
 	return true;
 }
