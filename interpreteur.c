@@ -114,28 +114,28 @@ void _interpret_pseudo_code() {
 
 		case GTR:
 			hold = _pile_top();
-			if (hold > _pile_top()) _pile_add(1);
+			if (hold < _pile_top()) _pile_add(1);
 			else _pile_add(0);
 			pc++;
 			break;
 
 		case LSS:
 			hold = _pile_top();
-			if (hold < _pile_top()) _pile_add(1);
+			if (hold > _pile_top()) _pile_add(1);
 			else _pile_add(0);
 			pc++;
 			break;
 
 		case GEQ:
 			hold = _pile_top();
-			if (hold >= _pile_top()) _pile_add(1);
+			if (hold <= _pile_top()) _pile_add(1);
 			else _pile_add(0);
 			pc++;
 			break;
 
 		case LEQ:
 			hold = _pile_top();
-			if (hold <= _pile_top()) _pile_add(1);
+			if (hold >= _pile_top()) _pile_add(1);
 			else _pile_add(0);
 			pc++;
 			break;
@@ -224,6 +224,13 @@ void _interpret_pseudo_code() {
 			for (int i = 0; i < (int) current_node->line.parameter; i++) {
 				_pile_top();
 			}
+			pc++;
+			break;
+
+		case DUP:
+			hold = _pile_top();
+			_pile_add(hold);
+			_pile_add(hold);
 			pc++;
 			break;
 

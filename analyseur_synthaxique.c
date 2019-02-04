@@ -413,22 +413,38 @@ static boolean CASE_STATEMENT() {
 
 	if (current_symbol.code != ID_TOKEN) raise_error(IDENTIFIER_EXPECTED_ERROR);
 	if (symbol_exists() == -1) raise_error(SYMBOL_DONT_EXIST);
+	_pseudo_code_add_inst(LDA, get_address());
+	_pseudo_code_add_inst(LDV, 0);
 	next_symbol();
 
 	if (current_symbol.code != IS_TOKEN) raise_error(IS_EXPECTED_ERROR);
 	next_symbol();
 
+	int counter = 0;
+
 	while (current_symbol.code == WHEN_TOKEN) {
+		counter++;
 		next_symbol();
 
+		_pseudo_code_add_inst(DUP, 0);
+
 		if (current_symbol.code != INTEGER_TOKEN) raise_error(INTEGER_EXPECTED_ERROR);
+		_pseudo_code_add_inst(LDI, atoi(current_symbol.word));
+		_pseudo_code_add_inst(EQL, 0);
+		_pseudo_code_add_inst(BZE, -1);
+
 		next_symbol();
 
 		if (current_symbol.code != NEXT_TOKEN) raise_error(NEXT_EXPECTED_ERROR);
 		next_symbol();
 
 		if (!SEQUENCE_OF_STATEMENT()) raise_error(SEQUENCE_STATEMENT_ERROR);
+
+		_pseudo_code_add_inst(BRN, -1);
+		_pseudo_code_fix_bze();
 	}
+
+	for (int i = 0; i < counter; i++) _pseudo_code_fix_brn();
 
 	if (current_symbol.code != END_TOKEN) raise_error(END_EXPECTED_ERROR);
 	next_symbol();
@@ -437,6 +453,8 @@ static boolean CASE_STATEMENT() {
 
 	if (current_symbol.code != SEMICOLON_TOKEN) raise_error(SEMICOLON_EXPECTED_ERROR);
 	next_symbol();
+
+	_pseudo_code_add_inst(FRE, 1);
 
 	return true;
 }
