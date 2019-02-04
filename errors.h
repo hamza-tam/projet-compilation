@@ -3,7 +3,7 @@
 
 #include "global.h"
 
-#define ERRORS_NUMBER	3
+#define ERRORS_NUMBER	42
 
 
 typedef enum _error_codes {
@@ -43,7 +43,6 @@ typedef enum _error_codes {
 	DEUXPOINT_EXPECTED_ERROR,
 	SEMICOLON_ERROR,
 	SYMBOL_EXISTS_ERROR, // 35
-
 	LOOP_EXPECTED_ERROR,
 	SYMBOL_DONT_EXIST,
 	ASSIGNEMENT_TO_CONST_ERROR,
