@@ -399,11 +399,11 @@ static boolean SIMPLE_STATEMENT() {
 }
 
 
-// COMPOUND_STATEMENT ::= IF_STATEMENT | CASE_STATEMENT | LOOP_STATEMENT
+// COMPOUND_STATEMENT ::= IF_STATEMENT | CASE_STATEMENT | LOOP_STATEMENTS
 static boolean COMPOUND_STATEMENT() {
 	if(IF_STATEMENT()) return true;
 	else if(CASE_STATEMENT()) return true;
-	else if(LOOP_STATEMENT()) return true;
+	else if(LOOP_STATEMENTS()) return true;
 	return false;
 }
 
@@ -411,11 +411,53 @@ static boolean CASE_STATEMENT() {
 	return false;
 }
 
+/*
+ * LOOP_STATEMENTS ::= WHILE_LOOP_STATEMENT | FOR_LOOP_STATEMENT | LOOP_STATEMENT;
+ */
+static boolean LOOP_STATEMENTS() {
+	if (WHILE_LOOP_STATEMENT()) return true;
+	else if (FOR_LOOP_STATEMENT()) return true;
+	else if (LOOP_STATEMENT()) return true;
+	else return false;
+}
+
+/*
+ * WHILE_LOOP_STATEMENT ::= while CONDITION loop SEQUENCE_OF_STATEMENT end [loop];
+ */
+static boolean WHILE_LOOP_STATEMENT() {
+	if (current_symbol.code != WHILE_TOKEN) return false;
+	next_symbol();
+
+	if (!CONDITION()) raise_error(CONDITION_ERROR);
+
+	if (current_symbol.code != LOOP_TOKEN) raise_error(LOOP_EXPECTED_ERROR);
+	next_symbol();
+
+	if(!SEQUENCE_OF_STATEMENT()) raise_error(SEQUENCE_STATEMENT_ERROR);
+
+	if (current_symbol.code != END_TOKEN) raise_error(END_EXPECTED_ERROR);
+	next_symbol();
+
+	if (current_symbol.code == LOOP_TOKEN) next_symbol();
+
+	if (current_symbol.code != SEMICOLON_TOKEN) raise_error(SEMICOLON_EXPECTED_ERROR);
+	next_symbol(); 
+
+	return true;
+}
+
+
+/*
+ * FOR_LOOP_STATEMENT ::= 
+ */
+static boolean FOR_LOOP_STATEMENT() {
+	return false;
+}
+
 
 /**
-
-loop_statement ::= loop sequence_of_statements end loop ;
-*/
+ * loop_statement ::= loop sequence_of_statements end loop ;
+ */
 static boolean LOOP_STATEMENT() {
 	if(current_symbol.code!=LOOP_TOKEN) return false;	
 	next_symbol();
@@ -462,6 +504,10 @@ static boolean LOOP_STATEMENT() {
  */
 static boolean ASSIGNEMENT_OR_PROCEDURE_CALL_STATEMENT() {
 	if (current_symbol.code != ID_TOKEN) return false;
+
+	/* Checking of the current identifier is a constant */
+	if (is_current_symbol_const()) raise_error(ASSIGNEMENT_TO_CONST_ERROR);
+
 	_pseudo_code_add_inst(LDA, get_address());
 	next_symbol();
 	if (!ASSIGNEMENT_OR_PROCEDURE_CALL_END_STATEMENT()) raise_error(ASSIGNEMENT_OR_PROCEDURE_CALL_END_STATEMENT_ERROR);
@@ -942,6 +988,8 @@ static boolean PRIMARY(){
 	}
 	else if(current_symbol.code==NULL_TOKEN) { next_symbol(); return true;}
 	else if(current_symbol.code==ID_TOKEN) {
+		/* Checking if the suymbol exists */
+		if (symbol_exists() == -1) raise_error(SYMBOL_DONT_EXIST);
 		/* Getting the type of the variable */
 		if (current_expression_type < get_type()) current_expression_type = get_type();
 

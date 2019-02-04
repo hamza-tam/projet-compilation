@@ -104,14 +104,14 @@ int _specific_symbol_exists(char *symbol) {
  */
 void show_symbol_table() {
 	printf("\n\n");
-	printf("==========================\n");
-	printf("=== Table des symboles ===\n");
-	printf("==========================\n");
-	printf("  Symbole  | Tp |  @ | Of\n");
-	printf("--------------------------\n");
+	printf("===============================\n");
+	printf("=== Table des symboles ========\n");
+	printf("===============================\n");
+	printf("  Symbole  | Tp |  @ | Of | Ct\n");
+	printf("-------------------------------\n");
 
 	for(int i = 0; i < symbol_table_size; i++) {
-		printf("%10s | %2i | %2i | %2i \n", symbol_table[i].word, symbol_table[i].type, symbol_table[i].address, symbol_table[i].offset);
+		printf("%10s | %2i | %2i | %2i | %2i \n", symbol_table[i].word, symbol_table[i].type, symbol_table[i].address, symbol_table[i].offset, symbol_table[i].is_const);
 	}
 }
 
@@ -142,6 +142,11 @@ void set_last_symbol_const() {
  */
 int get_last_symbol_address() {
 	return symbol_table[symbol_table_size - 1].address;
+}
+
+/* Retrieving the information if he is a constatnt */
+boolean is_current_symbol_const() {
+	return symbol_table[symbol_exists()].is_const;
 }
 
 /*
