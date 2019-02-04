@@ -1,4 +1,3 @@
-
 procedure main is
 
 	x:Integer;	

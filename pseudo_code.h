@@ -34,9 +34,10 @@ typedef enum _pcode_inst {
 	RTS, /* Return to address in the stack */
 	JSR, /* Jump to subroutine and add the return address to the stack */
 	FRE, /* Freeing the a number of memory spots in the pile */
+	DUP, /* Duplicate the top of the stack */
 } pcode_inst;
 
-static char inst_table[29][10] = {
+static char inst_table[30][10] = {
 	"ADD", /* Perform addition on the top spots of the stack */
 	"SUB", /* Perform substration on the top spots of the stack */
 	"MUL", /* Perform multiplication on the top spots of the stack */
@@ -66,6 +67,7 @@ static char inst_table[29][10] = {
 	"RTS",
 	"JSR",
 	"FRE",
+	"DUP",
 };
 
 

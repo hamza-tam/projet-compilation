@@ -229,6 +229,13 @@ printf("*********%i\n",pc);
 			pc++;
 			break;
 
+		case DUP:
+			hold = _pile_top();
+			_pile_add(hold);
+			_pile_add(hold);
+			pc++;
+			break;
+
 		default:
 			end = true;
 			break;

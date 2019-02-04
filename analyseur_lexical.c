@@ -169,6 +169,7 @@ static boolean is_special() {
 static boolean is_second_special() {
 	switch(current_char) {
 		case '=':
+		case '>':
 			return true; break;
 
 		default:
