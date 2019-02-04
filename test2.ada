@@ -1,15 +1,17 @@
-procedure test is
+procedure main is 
 
-	v : Integer;
+	c : Integer;
 
-begin 
+begin
+	
+	Put('\n');
+	Put("BIENVENUE");
+	Put('\n');
 
-	v := 3;
+	while c /= 0 loop
 
-	case v is
-		when 1 => Put("a");
-		when 2 => Put("b");
-		when others => Put("c");
-	end case;
+		afficher_menu;
 
-end ;
+	end loop; 
+
+end;

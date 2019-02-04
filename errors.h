@@ -49,7 +49,7 @@ typedef enum _error_codes {
 	ASSIGNEMENT_TO_CONST_ERROR,
 	INTEGER_EXPECTED_ERROR,
 	NEXT_EXPECTED_ERROR,
-
+	IN_EXPECTED_ERROR,
 } error_code;
 
 

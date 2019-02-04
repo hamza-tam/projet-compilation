@@ -508,7 +508,33 @@ static boolean WHILE_LOOP_STATEMENT() {
  * FOR_LOOP_STATEMENT ::= 
  */
 static boolean FOR_LOOP_STATEMENT() {
-	return false;
+	if (current_symbol.code != FOR_TOKEN) return false;
+	next_symbol();
+
+	if (current_symbol.code != ID_TOKEN) raise_error(IDENTIFIER_EXPECTED_ERROR);
+	next_symbol();
+
+	if (current_symbol.code != IN_TOKEN) raise_error(IN_EXPECTED_ERROR);
+	next_symbol();
+
+	if (current_symbol.code == INTEGER_TOKEN) next_symbol();
+
+	if (current_symbol.code == POINT_POINT_TOKEN) next_symbol();
+
+	if (current_symbol.code == INTEGER_TOKEN) next_symbol();
+
+	if (current_symbol.code != LOOP_TOKEN) raise_error(LOOP_EXPECTED_ERROR);
+	next_symbol();
+
+	if(!SEQUENCE_OF_STATEMENT()) raise_error(SEQUENCE_STATEMENT_ERROR);
+
+	if (current_symbol.code != END_TOKEN) raise_error(END_EXPECTED_ERROR);
+	next_symbol();
+
+	if (current_symbol.code == LOOP_TOKEN) next_symbol();
+
+	if (current_symbol.code != SEMICOLON_TOKEN) raise_error(SEMICOLON_EXPECTED_ERROR);
+	next_symbol(); 
 }
 
 
