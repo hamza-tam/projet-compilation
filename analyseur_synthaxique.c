@@ -9,6 +9,7 @@
 
 //PROGRAM := SUBPROGRAM_BODY
 boolean PROGRAM() {
+	WritePseudoCodeFile= false;
 	// Initialization
 	init_symbol();
 	init_symbol_table();
@@ -17,21 +18,25 @@ boolean PROGRAM() {
 	// Reading the first token
 	next_symbol();
 	
-	boolean result = false;
+
 	address_offset = 0;
 
 	// Trying to find the grammar to execute
-	if (SUBPROGRAM_BODY()) result = true;
+	SUBPROGRAM_BODY() ;
 
 	_pseudo_code_add_inst(LDA, get_first_procedure_address());
 	_pseudo_code_add_inst(JSR, 0);
 	_pseudo_code_add_inst(HLT, 0);
 
 	// Showing the symbol table
-	show_symbol_table();
-	_pseudo_code_write_text();
+	if(!WritePseudoCodeFile){
+		show_symbol_table();
+		_pseudo_code_write_text();
+	}
 
-	return result;
+	
+
+	return true;
 }
 
 
@@ -347,6 +352,9 @@ static boolean SUBTYPE_INDICATION() {
 	} else if (current_symbol.code == FLOAT_TYPE_TOKEN) {
 		set_last_symbol_type(TFLT);
 	}
+	else {
+		return false;
+	}
 	next_symbol();
 	return true;
 }
@@ -639,7 +647,6 @@ static boolean READ_STATEMENT() {
 	_pseudo_code_add_inst(RDF, 0);
 	_pseudo_code_add_inst(STO, 0);
 	next_symbol();
-
 	if (current_symbol.code != CLOSE_PARENTHESIS_TOKEN) raise_error(PF_EXPECTED_ERROR);
 	next_symbol();
 

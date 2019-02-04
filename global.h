@@ -199,4 +199,9 @@ int address_offset;
 
 symbol_type current_expression_type;
 
+boolean WritePseudoCodeFile;
+
+
+
+
 #endif

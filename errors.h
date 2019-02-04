@@ -3,7 +3,7 @@
 
 #include "global.h"
 
-#define ERRORS_NUMBER	3
+#define ERRORS_NUMBER	36
 
 
 typedef enum _error_codes {
@@ -29,7 +29,7 @@ typedef enum _error_codes {
 	MODE_ERROR,
 	PARAMETER_PROFILE_ERROR, // 20
 	PARAMETER_SPECIFICATION_ERROR,
-	PF_EXPECTED_ERROR,//20
+	PF_EXPECTED_ERROR,
 	PO_EXPECTED_ERROR,
 	PROCEDURE_EXPECTED_ERROR,
 	RELATION_EXPECTED_ERROR,
@@ -50,5 +50,7 @@ typedef enum _error_codes {
 
 
 void raise_error(error_code);
+
+void afficer_errors();
 
 #endif

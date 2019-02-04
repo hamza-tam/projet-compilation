@@ -6,7 +6,7 @@ procedure main is
 	procedure to_char is 
 		a : Character;
 	begin
-		Get(a);
+		Get(a;
 		Put(a);
 		Put('\n');
 	end;
@@ -26,6 +26,7 @@ begin
 		Get(c);
 		
 		if c = 1 then to_char;
+		end if;
 
 		exit when c = 0;
 	end loop;
