@@ -5,13 +5,14 @@ procedure main is
 
 begin 
 	
-	x:=10;
-	y:=5;
+	x:=0;
+	y:=0;
 
-	if x <= 1 xor y<5 then
-		x := x - 2;
+	for x in 2 .. 5 
+	LOOP
 		y:= y+1;
-	end if;
+	end LOOP;
+
 
 Put('x');Put('\n');
 Put(x);
@@ -19,3 +20,5 @@ Put('y');Put('\n');
 Put(y);
 
 end;
+
+
