@@ -10,7 +10,6 @@ void _pile_init() {
 
 void _pile_add(float e) {
 	if (pile_index == pile_max_index) {
-		printf("Pile size changed ! \n");
 		pile_max_index += 10;
 		/* We need to resize the pile  */
 		pile = realloc(pile, (pile_max_index + 1) * sizeof(float));

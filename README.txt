@@ -2,12 +2,10 @@
 
 ## Compilation du projet
 
-La compilation du projet a été faciltée par l'utilisation d'un Makefile
-
+	La compilation du projet a été facilitée par l'utilisation d'un Makefile
 
 	Pour compiler le compilateur, il faut exécuter la commande:
  	- make
-
 
 	Pour compiler l'interpreteur, il faudra utiliser la commande:
 	- make interpreteur
@@ -18,4 +16,4 @@ La compilation du projet a été faciltée par l'utilisation d'un Makefile
 	- ./compilateur
 
 	Pour utiliser l'interpreteur il faudra utiliser la commande:
-	- ./interpreteur
+	- ./interpreteur [debug]
