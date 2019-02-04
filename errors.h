@@ -3,7 +3,7 @@
 
 #include "global.h"
 
-#define ERRORS_NUMBER	3
+#define ERRORS_NUMBER	36
 
 
 typedef enum _error_codes {
@@ -52,5 +52,7 @@ typedef enum _error_codes {
 
 
 void raise_error(error_code);
+
+void afficer_errors();
 
 #endif

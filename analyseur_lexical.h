@@ -109,11 +109,13 @@ static char keywords[TOKEN_LIST_SIZE][20] = {
 	"Integer",
 	"Float",
 	"Character",
+	
 };
 
 
  void read_word();
 static void read_number();
+static void read_minus_or_comment();
 static void read_special();
 static void read_separator();
 static void read_comment();
@@ -124,6 +126,8 @@ static void read_end_of_file();
 static void read_new_line();
 
 
+
+static boolean is_minus_or_comment();
 static boolean is_special();
 static boolean is_char();
 static boolean is_numeric();

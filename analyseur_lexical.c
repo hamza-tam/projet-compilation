@@ -27,6 +27,7 @@ void next_symbol() {
 		// search for the grammar
 		if (is_end_of_file()) read_end_of_file();
 		else if(is_numeric()) read_number();
+		else if (is_minus_or_comment()) read_minus_or_comment();
 		else if (is_special()) read_special();
 		else if (is_double_quote()) read_string();
 		else if (is_new_line()) read_new_line();
@@ -128,6 +129,14 @@ static boolean is_numeric() {
 		return false;
 	}
 }
+
+static boolean is_minus_or_comment(){
+    switch (current_char) {
+	case '-': return true; break;	
+	default: return false; break;
+    }
+}
+
 
 /*
  * Checking if a character is a special character
@@ -409,6 +418,24 @@ static void read_numeral(){
 		next_char();
 	} 
 }
+
+static void read_minus_or_comment(){
+	next_char();
+	switch(current_char) {
+		case '-': 
+			next_char();
+			// Looping through the characters
+			while (current_char != '\n') {
+				next_char();
+			}
+			// Assigning the token
+			assign_token(SEPARATOR_TOKEN); break;
+		default: 
+			assign_token(NOTHING); break;
+	} 
+	
+}
+
 static void read_decimal_literal(){
 	
 	if(is_point_char()){

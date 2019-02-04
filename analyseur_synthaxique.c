@@ -9,6 +9,7 @@
 
 //PROGRAM := SUBPROGRAM_BODY
 boolean PROGRAM() {
+	WritePseudoCodeFile= false;
 	// Initialization
 	init_symbol();
 	init_symbol_table();
@@ -17,21 +18,25 @@ boolean PROGRAM() {
 	// Reading the first token
 	next_symbol();
 	
-	boolean result = false;
+
 	address_offset = 0;
 
 	// Trying to find the grammar to execute
-	if (SUBPROGRAM_BODY()) result = true;
+	SUBPROGRAM_BODY() ;
 
 	_pseudo_code_add_inst(LDA, get_first_procedure_address());
 	_pseudo_code_add_inst(JSR, 0);
 	_pseudo_code_add_inst(HLT, 0);
 
 	// Showing the symbol table
-	show_symbol_table();
-	_pseudo_code_write_text();
+	if(!WritePseudoCodeFile){
+		show_symbol_table();
+		_pseudo_code_write_text();
+	}
 
-	return result;
+	
+
+	return true;
 }
 
 
@@ -346,9 +351,12 @@ static boolean SUBTYPE_INDICATION() {
 		set_last_symbol_type(TCHR);
 	} else if (current_symbol.code == FLOAT_TYPE_TOKEN) {
 		set_last_symbol_type(TFLT);
+	} else {
+		return false;
 	}
-	
+
 	next_symbol();
+	
 	return true;
 }
 
@@ -465,7 +473,7 @@ static boolean ASSIGNEMENT_OR_PROCEDURE_CALL_STATEMENT() {
 	if (current_symbol.code != ID_TOKEN) return false;
 	_pseudo_code_add_inst(LDA, get_address());
 	next_symbol();
-	if(!ASSIGNEMENT_OR_PROCEDURE_CALL_END_STATEMENT()) raise_error(ASSIGNEMENT_OR_PROCEDURE_CALL_END_STATEMENT_ERROR);
+	if (!ASSIGNEMENT_OR_PROCEDURE_CALL_END_STATEMENT()) raise_error(ASSIGNEMENT_OR_PROCEDURE_CALL_END_STATEMENT_ERROR);
 
 	return true;
 }
@@ -640,7 +648,6 @@ static boolean READ_STATEMENT() {
 	_pseudo_code_add_inst(RDF, 0);
 	_pseudo_code_add_inst(STO, 0);
 	next_symbol();
-
 	if (current_symbol.code != CLOSE_PARENTHESIS_TOKEN) raise_error(PF_EXPECTED_ERROR);
 	next_symbol();
 
@@ -693,9 +700,11 @@ static boolean IF_STATEMENT(){
 	_pseudo_code_add_inst(BRN,-1);
 	_pseudo_code_fix_bze();//Mery
 
+	int counter = 1;
+
 	// {else if CONDITION then SEQUENCE_OF_STATEMENT}
 	while(current_symbol.code==ELSIF_TOKEN){
-		
+		counter++;
 		//indice_brn = line_number;
 		next_symbol();
 		
@@ -740,8 +749,7 @@ static boolean IF_STATEMENT(){
 
 	//Mery
 	
-		_pseudo_code_fix_brn();	
-		_pseudo_code_fix_brn();	
+	for (int i = 0; i < counter; i++) _pseudo_code_fix_brn();
 
 	//indice_brn = line_number;
 	
@@ -816,11 +824,11 @@ static boolean RELATION(){
 		}
 
 		if (op == EQUAL_TOKEN) _pseudo_code_add_inst(EQL, 0);//Mery		
-		//if (op == LESS_TOKEN) _pseudo_code_add_inst(LSS, 0);//Mery
-		//if (op == LESS_EQUAL_TOKEN) _pseudo_code_add_inst(LEQ, 0);//Mery				
-		//if (op == GREATER_TOKEN) _pseudo_code_add_inst(GT, 0);//Mery
-		//if (op == GREATER_EQUAL_TOKEN) _pseudo_code_add_inst(GEQ, 0);//Mery		
-		//if (op == DIFF_TOKEN) _pseudo_code_add_inst(NEQ, 0);//Mery
+		else if (op == LESS_TOKEN) _pseudo_code_add_inst(LSS, 0);//Mery
+		else if (op == LESS_EQUAL_TOKEN) _pseudo_code_add_inst(LEQ, 0);//Mery				
+		//else if (op == GREATER_TOKEN) _pseudo_code_add_inst(GRT, 0);//Mery
+		else if (op == GREATER_EQUAL_TOKEN) _pseudo_code_add_inst(GEQ, 0);//Mery		
+		else if (op == DIFF_TOKEN) _pseudo_code_add_inst(NEQ, 0);//Mery
 
 				
 	}
